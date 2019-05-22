@@ -3,18 +3,69 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+
+use App\Entity\Receita;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ReceitaRepository;
 
 class RecipeController extends AbstractController
 {
-    /**
-     * @Route("/recipe", name="recipe")
-     */
-    public function index()
+
+    protected $repository;
+    protected $entityManager;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        ReceitaRepository $repository
+        ) {
+        $this->entityManager = $entityManager;
+        $this->repository = $repository;
+    }
+
+    public function novaReceita(Request $request): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/RecipeController.php',
+        $corpoRequisicao = $request->getContent();
+        $dadoEmJson = json_decode($corpoRequisicao);
+
+        $receita = new Receita();
+        $receita
+            ->setNome($dadoEmJson->Nome)
+            ->setDescricao($dadoEmJson->Descricao);
+
+        $entityManager->persist($receita);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'ID' => $receita->getId()
         ]);
     }
+
+    public function mostraReceita($id): JsonResponse
+    {
+        $receita = $this->repository->find($id);
+
+        if (!$receita) {
+            throw $this->createNotFoundException(
+                'No recipe found for id '.$id
+            );
+        }
+
+        return new JsonResponse([
+            'Nome da receita' => $receita->getNome(),
+            'Descrição' => $receita->getDescricao()
+            ]);
+    }
+
+    public function listaTodas(): JsonResponse
+    {
+
+        $listaReceitas = $this->repository->findAll();
+        
+        return new JsonResponse($listaReceitas);
+    }
+
 }

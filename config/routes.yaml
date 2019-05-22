@@ -1,3 +1,18 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+mostra_receita:
+    path: /recipe/{id}
+    controller: App\Controller\RecipeController::mostraReceita
+    methods:
+        - GET
+mostra_todas:
+    path: /recipes
+    controller: App\Controller\RecipeController::listaTodas
+    methods:
+        - GET
+nova_receita:
+    path: /recipe
+    controller: App\Controller\RecipeController::novaReceita
+    methods:
+        - POST
