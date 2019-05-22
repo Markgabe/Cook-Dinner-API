@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Entity\Receita;
+use App\Entity\Avaliacao;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReceitaRepository;
 
@@ -26,46 +26,44 @@ class RecipeController extends AbstractController
         $this->repository = $repository;
     }
 
-    public function novaReceita(Request $request): JsonResponse
+    public function novaAvaliacao(Request $request): JsonResponse
     {
         $corpoRequisicao = $request->getContent();
         $dadoEmJson = json_decode($corpoRequisicao);
 
-        $receita = new Receita();
-        $receita
-            ->setNome($dadoEmJson->Nome)
-            ->setDescricao($dadoEmJson->Descricao);
+        $avaliacao = new Avaliacao();
+        $avaliacao
+            ->setNota($dadoEmJson->Nota)
+            ->setFavorito($dadoEmJson->Favorito);
 
-        $this->entityManager->persist($receita);
+        $this->entityManager->persist($avaliacao);
         $this->entityManager->flush();
 
         return new JsonResponse([
-            'ID' => $receita->getId()
+            'ID' => $avaliacao->getId()
         ]);
     }
 
-    public function mostraReceita($id): JsonResponse
+    public function mostraAvaliacao($id): JsonResponse
     {
-        $receita = $this->repository->find($id);
+        $avaliacao = $this->repository->find($id);
 
-        if (!$receita) {
+        if (!$avaliacao) {
             throw $this->createNotFoundException(
-                'No recipe found for id '.$id
+                'No avaliacao found for id '.$id
             );
         }
 
         return new JsonResponse([
-            'Nome da receita' => $receita->getNome(),
-            'Descrição' => $receita->getDescricao()
+            'Nota da receita' => $avaliacao->getNota(),
+            'Favorito' => $avaliacao->getFavorito()
             ]);
     }
 
     public function listaTodas(): JsonResponse
     {
-
-        $listaReceitas = $this->repository->findAll();
-
-        return new JsonResponse($listaReceitas);
+        $listaAvaliacoes = $this->repository->findAll();
+        return new JsonResponse($listaAvaliacoes);
     }
 
 }
