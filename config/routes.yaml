@@ -16,3 +16,13 @@ nova_receita:
     controller: App\Controller\RecipeController::novaReceita
     methods:
         - POST
+nova_avaliacao:
+    path: /rate
+    controller: App\Controller\AvaliacaoController::novaAvaliacao
+    methods:
+        - POST
+mostra_todas_avaliacoes:
+    path: /rates
+    controller: App\Controller\AvaliacaoController::listaTodas
+    methods:
+        - GET

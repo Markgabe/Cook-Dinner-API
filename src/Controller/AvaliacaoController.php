@@ -10,20 +10,24 @@ use Symfony\Component\HttpFoundation\Request;
 
 use App\Entity\Avaliacao;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\AvaliacaoRepository;
 use App\Repository\ReceitaRepository;
 
-class RecipeController extends AbstractController
+class AvaliacaoController extends AbstractController
 {
 
+    protected $recipeRepository;
     protected $repository;
     protected $entityManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        ReceitaRepository $repository
+        AvaliacaoRepository $repository,
+        ReceitaRepository $recipeRepository
         ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
+        $this->recipeRepository = $recipeRepository;
     }
 
     public function novaAvaliacao(Request $request): JsonResponse
@@ -31,17 +35,23 @@ class RecipeController extends AbstractController
         $corpoRequisicao = $request->getContent();
         $dadoEmJson = json_decode($corpoRequisicao);
 
+        $receita = $this->recipeRepository->find($dadoEmJson->RID);
+        if (!$receita) {
+            throw $this->createNotFoundException(
+                'No recipe found for id '.$id
+            );
+        }
+
         $avaliacao = new Avaliacao();
         $avaliacao
             ->setNota($dadoEmJson->Nota)
-            ->setFavorito($dadoEmJson->Favorito);
+            ->setFavorito($dadoEmJson->Favorito)
+            ->setReceita($receita);
 
         $this->entityManager->persist($avaliacao);
         $this->entityManager->flush();
 
-        return new JsonResponse([
-            'ID' => $avaliacao->getId()
-        ]);
+        return new JsonResponse($avaliacao);
     }
 
     public function mostraAvaliacao($id): JsonResponse

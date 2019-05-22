@@ -39,9 +39,7 @@ class RecipeController extends AbstractController
         $this->entityManager->persist($receita);
         $this->entityManager->flush();
 
-        return new JsonResponse([
-            'ID' => $receita->getId()
-        ]);
+        return new JsonResponse($receita);
     }
 
     public function mostraReceita($id): JsonResponse
@@ -54,10 +52,7 @@ class RecipeController extends AbstractController
             );
         }
 
-        return new JsonResponse([
-            'Nome da receita' => $receita->getNome(),
-            'Descrição' => $receita->getDescricao()
-            ]);
+        return new JsonResponse($receita);
     }
 
     public function listaTodas(): JsonResponse

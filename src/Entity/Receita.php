@@ -87,7 +87,7 @@ class Receita implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->getId(),
+            'Id' => $this->getId(),
             'Nome' => $this->getNome(),
             'Descrição' => $this->getDescricao()
         ];

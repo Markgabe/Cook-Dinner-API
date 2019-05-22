@@ -17,7 +17,7 @@ class Avaliacao implements \JsonSerializable
     private $id;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $Nota;
 
@@ -37,12 +37,12 @@ class Avaliacao implements \JsonSerializable
         return $this->id;
     }
 
-    public function getNota(): ?float
+    public function getNota(): ?int
     {
         return $this->Nota;
     }
 
-    public function setNota(?float $Nota): self
+    public function setNota(?int $Nota): self
     {
         $this->Nota = $Nota;
 
@@ -76,9 +76,10 @@ class Avaliacao implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->getId(),
+            'Id' => $this->getId(),
             'Nota' => $this->getNota(),
-            'Favorito' => $this->getFavorito()
+            'Favorito' => $this->getFavorito(),
+            'Id_Receita' => $this->getReceita()->getId()
         ];
     }
 }
