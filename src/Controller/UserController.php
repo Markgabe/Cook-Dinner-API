@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,9 +20,6 @@ class UserController extends AbstractController
         $this->manager = $manager;
     }
 
-    /**
-     * @Route("/sign_in", name="new_user")
-     */
     public function newUser(Request $request): JsonResponse
     {
         $jsonRequest = json_decode($request->getContent());

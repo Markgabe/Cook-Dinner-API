@@ -26,3 +26,8 @@ mostra_todas_avaliacoes:
     controller: App\Controller\AvaliacaoController::listaTodas
     methods:
         - GET
+new_user:
+    path: /sign_up
+    controller: App\Controller\UserController::newUser
+    methods:
+        - POST
