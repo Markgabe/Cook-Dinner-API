@@ -57,9 +57,7 @@ class RecipeController extends AbstractController
 
     public function listaTodas(): JsonResponse
     {
-
         $listaReceitas = $this->repository->findAll();
-
         return new JsonResponse($listaReceitas);
     }
 
