@@ -8,10 +8,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+use App\Entity\User;
+
 use App\Entity\Receita;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReceitaRepository;
 use App\Helper\ExtratorDadosRequest;
+
+use App\Controller\UserController;
 
 class RecipeController extends AbstractController
 {
@@ -35,10 +39,14 @@ class RecipeController extends AbstractController
         $corpoRequisicao = $request->getContent();
         $dadoEmJson = json_decode($corpoRequisicao);
 
+        $repositorio = $this->getDoctrine()->getRepository(User::class);
+        $user = UserController::getUserByToken($request, $repositorio);
+
         $receita = new Receita();
         $receita
             ->setNome($dadoEmJson->Nome)
-            ->setDescricao($dadoEmJson->Descricao);
+            ->setDescricao($dadoEmJson->Descricao)
+            ->setUser($user);
 
         $this->entityManager->persist($receita);
         $this->entityManager->flush();

@@ -56,4 +56,13 @@ class UserController extends AbstractController
         return new JsonResponse($cred);
     }
 
+    public function getUserByToken(Request $request, $repository)
+    {
+        $cred = JwtAutenticador::getCredentials($request);
+        $user = $repository->findOneBy([
+            'email' => $cred->email
+        ]);
+        return $user;
+    }
+
 }
