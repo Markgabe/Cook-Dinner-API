@@ -12,6 +12,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use App\Security\JwtAutenticador;
+use Firebase\JWT\JWT;
 
 class UserController extends AbstractController
 {
@@ -35,13 +36,14 @@ class UserController extends AbstractController
         $this->manager->persist($user);
         $this->manager->flush();
 
+        $token = JWT::encode(['email' => $user->getEmail()], 'MinhaChaveBolada', 'HS256');
+
         return new JsonResponse([
-            'email' => $user->getEmail(),
-            'senha' => $user->getPassword()
+            'access-token' => $token
         ]);
     }
 
-    public function findIdByEmail(Request $request): JsonResponse 
+    public function findIdByEmail(Request $request): JsonResponse
     {
         $dadosEmJson = json_decode($request->getContent());
         $user = $this->repository->findOneBy([
