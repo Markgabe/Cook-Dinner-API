@@ -21,6 +21,11 @@ nova_receita:
     controller: App\Controller\RecipeController::novaReceita
     methods:
         - POST
+remove_receita:
+    path: /recipe/{id}
+    controller: App\Controller\RecipeController::removeReceita
+    methods:
+        - DELETE
 nova_avaliacao:
     path: /rate
     controller: App\Controller\AvaliacaoController::novaAvaliacao

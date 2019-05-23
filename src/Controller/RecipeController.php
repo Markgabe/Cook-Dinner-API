@@ -92,4 +92,13 @@ class RecipeController extends AbstractController
         return new JsonResponse($recipeList);
     }
 
+    public function removeReceita(int $id): Response
+    {
+        $entidade = $this->repository->find($id);
+        $this->entityManager->remove($entidade);
+        $this->entityManager->flush();
+
+        return new Response('', Response::HTTP_NO_CONTENT);
+    }
+
 }
