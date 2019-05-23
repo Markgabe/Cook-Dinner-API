@@ -11,19 +11,23 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Receita;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReceitaRepository;
+use App\Helper\ExtratorDadosRequest;
 
 class RecipeController extends AbstractController
 {
 
     protected $repository;
     protected $entityManager;
+    private $extratorDadosRequest;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        ReceitaRepository $repository
+        ReceitaRepository $repository,
+        ExtratorDadosRequest $extratorDadosRequest
         ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
+        $this->extratorDadosRequest = $extratorDadosRequest;
     }
 
     public function novaReceita(Request $request): JsonResponse
@@ -55,10 +59,20 @@ class RecipeController extends AbstractController
         return new JsonResponse($receita);
     }
 
-    public function listaTodas(): JsonResponse
+    public function listaTodas(Request $request): JsonResponse
     {
-        $listaReceitas = $this->repository->findAll();
-        return new JsonResponse($listaReceitas);
+        $filtro = $this->extratorDadosRequest->buscaDadosFiltro($request);
+        $informacoesDeOrdenacao = $this->extratorDadosRequest->buscaDadosOrdenacao($request);
+        [$paginaAtual, $itensPorPagina] = $this->extratorDadosRequest->buscaDadosPaginacao($request);
+
+        $lista = $this->repository->findBy(
+            $filtro,
+            $informacoesDeOrdenacao,
+            $itensPorPagina,
+            ($paginaAtual - 1) * $itensPorPagina
+        );
+
+        return new JsonResponse($lista);
     }
 
 }

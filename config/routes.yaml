@@ -31,3 +31,13 @@ new_user:
     controller: App\Controller\UserController::newUser
     methods:
         - POST
+find_user:
+    path: /find
+    controller: App\Controller\UserController::findIdByEmail
+    methods:
+        - POST
+get_cred:
+    path: /cred
+    controller: App\Controller\UserController::getCred
+    methods:
+        - GET
