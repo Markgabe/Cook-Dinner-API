@@ -11,6 +11,11 @@ mostra_todas:
     controller: App\Controller\RecipeController::listaTodas
     methods:
         - GET
+mostra_todas_usuario:
+    path: /recipes/{userId}
+    controller: App\Controller\RecipeController::listaReceitasUsuario
+    methods:
+        - GET
 nova_receita:
     path: /recipe
     controller: App\Controller\RecipeController::novaReceita

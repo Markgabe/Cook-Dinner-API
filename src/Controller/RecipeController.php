@@ -83,4 +83,13 @@ class RecipeController extends AbstractController
         return new JsonResponse($lista);
     }
 
+    public function listaReceitasUsuario(int $userId): JsonResponse
+    {
+        $repositorio = $this->getDoctrine()->getRepository(User::class);
+        $recipeList = $this->repository->findBy([
+            'user' => $repositorio->find($userId)
+        ]);
+        return new JsonResponse($recipeList);
+    }
+
 }
