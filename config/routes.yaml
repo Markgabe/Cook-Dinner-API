@@ -51,3 +51,13 @@ get_cred:
     controller: App\Controller\UserController::getCred
     methods:
         - GET
+follow:
+    path: /follow/{id}
+    controller: App\Controller\UserController::startFollowing
+    methods:
+        - GET
+get_followers:
+    path: /followers
+    controller: App\Controller\UserController::getAllFollowers
+    methods:
+        - GET

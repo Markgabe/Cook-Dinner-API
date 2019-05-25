@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="`user`")
  */
-class User implements UserInterface
+class User implements UserInterface, \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -41,9 +41,21 @@ class User implements UserInterface
      */
     private $Recipes;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="isFollowedBy")
+     */
+    private $follow;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="follow")
+     */
+    private $isFollowedBy;
+
     public function __construct()
     {
         $this->Recipes = new ArrayCollection();
+        $this->follow = new ArrayCollection();
+        $this->isFollowedBy = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -153,5 +165,67 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getFollow(): Collection
+    {
+        return $this->follow;
+    }
+
+    public function addFollow(self $follow): self
+    {
+        if (!$this->follow->contains($follow)) {
+            $this->follow[] = $follow;
+        }
+
+        return $this;
+    }
+
+    public function removeFollow(self $follow): self
+    {
+        if ($this->follow->contains($follow)) {
+            $this->follow->removeElement($follow);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getIsFollowedBy(): Collection
+    {
+        return $this->isFollowedBy;
+    }
+
+    public function addIsFollowedBy(self $isFollowedBy): self
+    {
+        if (!$this->isFollowedBy->contains($isFollowedBy)) {
+            $this->isFollowedBy[] = $isFollowedBy;
+            $isFollowedBy->addFollow($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIsFollowedBy(self $isFollowedBy): self
+    {
+        if ($this->isFollowedBy->contains($isFollowedBy)) {
+            $this->isFollowedBy->removeElement($isFollowedBy);
+            $isFollowedBy->removeFollow($this);
+        }
+
+        return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'Id' => $this->getId(),
+            'Email' => $this->getEmail()
+        ];
     }
 }

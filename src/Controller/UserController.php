@@ -67,4 +67,27 @@ class UserController extends AbstractController
         return $user;
     }
 
+    public function startFollowing(Request $request, $id): JsonResponse
+    {
+        $user = $this->getUserByToken($request, $this->repository);
+        $targetUser = $this->repository->find($id);
+        $user->addFollow($targetUser);
+        $targetUser->addIsFollowedBy($user);
+        return new JsonResponse([
+            'user'=> $user->getId(),
+            'followedUser'=> $targetUser->getId()
+        ]);
+    }
+
+    public function getAllFollowers(Request $request): JsonResponse
+    {
+        $user = $this->getUserByToken($request, $this->repository);
+        $list = $user->getIsFollowedBy();
+        $this->manager->flush();
+        return new JsonResponse([
+            "lista" => $list,
+            "user" => $user
+        ]);
+    }
+
 }
