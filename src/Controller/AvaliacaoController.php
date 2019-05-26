@@ -47,6 +47,8 @@ class AvaliacaoController extends AbstractController
             ->setNota($dadoEmJson->Nota)
             ->setFavorito($dadoEmJson->Favorito)
             ->setReceita($receita);
+        $receita
+            ->addAvaliacao($avaliacao);
 
         $this->entityManager->persist($avaliacao);
         $this->entityManager->flush();
