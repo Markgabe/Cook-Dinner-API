@@ -14,6 +14,8 @@ use App\Entity\User;
 use App\Security\JwtAutenticador;
 use Firebase\JWT\JWT;
 
+use JMS\Serializer\SerializerBuilder;
+
 class UserController extends AbstractController
 {
 
@@ -67,25 +69,42 @@ class UserController extends AbstractController
         return $user;
     }
 
-    public function startFollowing(Request $request, $id): JsonResponse
+    public function startFollowing(Request $request): JsonResponse
     {
+        $dadoEmJson = json_decode($request->getContent());
+
         $user = $this->getUserByToken($request, $this->repository);
-        $targetUser = $this->repository->find($id);
+        $targetUser = $this->repository->find($dadoEmJson->id);
+
+        if (!$targetUser) {
+            throw $this->createNotFoundException(
+                'No user found for id '.$dadosEmJson->id
+            );
+        }
+
         $user->addFollow($targetUser);
         $targetUser->addIsFollowedBy($user);
+
+        $this->manager->flush();
+
         return new JsonResponse([
             'user'=> $user->getId(),
             'followedUser'=> $targetUser->getId()
         ]);
+
     }
 
     public function getAllFollowers(Request $request): JsonResponse
     {
+        $serializer = SerializerBuilder::create()->build();
+
         $user = $this->getUserByToken($request, $this->repository);
         $list = $user->getIsFollowedBy();
-        $this->manager->flush();
+        $list = $serializer->serialize($list, 'json');
+        $followList = $user->getFollow();
         return new JsonResponse([
-            "lista" => $list,
+            "lista" => json_decode($list),
+            "segue" => json_encode($followList),
             "user" => $user
         ]);
     }

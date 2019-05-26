@@ -36,8 +36,7 @@ class RecipeController extends AbstractController
 
     public function novaReceita(Request $request): JsonResponse
     {
-        $corpoRequisicao = $request->getContent();
-        $dadoEmJson = json_decode($corpoRequisicao);
+        $dadoEmJson = json_decode($request->getContent());
 
         $repositorio = $this->getDoctrine()->getRepository(User::class);
         $user = UserController::getUserByToken($request, $repositorio);

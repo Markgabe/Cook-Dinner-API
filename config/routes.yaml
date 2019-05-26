@@ -52,10 +52,10 @@ get_cred:
     methods:
         - GET
 follow:
-    path: /follow/{id}
+    path: /follow
     controller: App\Controller\UserController::startFollowing
     methods:
-        - GET
+        - POST
 get_followers:
     path: /followers
     controller: App\Controller\UserController::getAllFollowers
