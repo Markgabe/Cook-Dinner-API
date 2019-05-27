@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+use App\Helper\UserFactory;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
@@ -20,20 +21,22 @@ class UserController extends AbstractController
 {
 
     protected $manager;
+    protected $factory;
     private $repository;
 
-    public function __construct( EntityManagerInterface $manager, UserRepository $repository ) {
+    public function __construct( 
+        EntityManagerInterface $manager,
+        UserRepository $repository,
+        UserFactory $factory
+        ) {
         $this->manager = $manager;
         $this->repository = $repository;
+        $this->factory = $factory;
     }
 
     public function newUser(Request $request): JsonResponse
     {
-        $jsonRequest = json_decode($request->getContent());
-
-        $user = new User();
-        $user->setEmail($jsonRequest->email)
-             ->setPassword($jsonRequest->senha);
+        $user = $this->factory->newUser($request);
 
         $this->manager->persist($user);
         $this->manager->flush();
@@ -60,20 +63,11 @@ class UserController extends AbstractController
         return new JsonResponse($cred);
     }
 
-    public function getUserByToken(Request $request, $repository)
-    {
-        $cred = JwtAutenticador::getCredentials($request);
-        $user = $repository->findOneBy([
-            'email' => $cred->email
-        ]);
-        return $user;
-    }
-
     public function startFollowing(Request $request): JsonResponse
     {
         $dadoEmJson = json_decode($request->getContent());
 
-        $user = $this->getUserByToken($request, $this->repository);
+        $user = $this->factory->getUserByToken($request, $this->repository);
         $targetUser = $this->repository->find($dadoEmJson->id);
 
         if (!$targetUser) {
@@ -98,28 +92,16 @@ class UserController extends AbstractController
     {
         $serializer = SerializerBuilder::create()->build();
 
-        $user = $this->getUserByToken($request, $this->repository);
-        $list = $user->getIsFollowedBy();
-        $list = $serializer->serialize($list, 'json');
-        $followList = $user->getFollow();
-        $followList = $serializer->serialize($followList, 'json');
+        $user = $this->factory->getUserByToken($request, $this->repository);
+
+        $list = $serializer->serialize($user->getIsFollowedBy(), 'json');
+        $followList = $serializer->serialize($user->getFollow(), 'json');
+
         return new JsonResponse([
-            "seguidores" => $this->listSerialize($list),
-            "segue" => $this->listSerialize($followList),
-            "user" => $user
+            "seguidores" => $this->factory->listSerialize($list),
+            "segue" => $this->factory->listSerialize($followList)
         ]);
     }
 
-    public function listSerialize($lis)
-    {
-            $newArray = array();
-            $list = json_decode($lis);
-            foreach ( $list as $item ) {
-                $new = (object) ['id' => $item->id, 'email' => $item->email];
-                array_push($newArray, $new);
-            }
-
-            return $newArray;
-    }
 
 }
