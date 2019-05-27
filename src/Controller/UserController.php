@@ -102,11 +102,24 @@ class UserController extends AbstractController
         $list = $user->getIsFollowedBy();
         $list = $serializer->serialize($list, 'json');
         $followList = $user->getFollow();
+        $followList = $serializer->serialize($followList, 'json');
         return new JsonResponse([
-            "lista" => json_decode($list),
-            "segue" => json_encode($followList),
+            "seguidores" => $this->listSerialize($list),
+            "segue" => $this->listSerialize($followList),
             "user" => $user
         ]);
+    }
+
+    public function listSerialize($lis)
+    {
+            $newArray = array();
+            $list = json_decode($lis);
+            foreach ( $list as $item ) {
+                $new = (object) ['id' => $item->id, 'email' => $item->email];
+                array_push($newArray, $new);
+            }
+
+            return $newArray;
     }
 
 }
