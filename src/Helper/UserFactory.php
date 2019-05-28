@@ -1,7 +1,10 @@
 <?php
 
+namespace App\Helper;
+
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use App\Security\JwtAutenticador;
 
 class UserFactory {
 

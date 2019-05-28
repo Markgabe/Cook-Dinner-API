@@ -63,3 +63,8 @@ get_followers:
     controller: App\Controller\UserController::getAllFollowers
     methods:
         - GET
+store_profile_pic:
+    path: /pic
+    controller: App\Controller\UserController::storePicture
+    methods:
+        - POST

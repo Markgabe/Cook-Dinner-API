@@ -103,5 +103,13 @@ class UserController extends AbstractController
         ]);
     }
 
+    public function storePicture(Request $request): JsonResponse
+    {
+        $file = $request->files->get('picture');
+        $user = $this->factory->getUserByToken($request, $this->repository);
+        $file->move($this->getParameter('image_upload_directory'), $user->getId().'.png');
+        return new JsonResponse();
+    }
+
 
 }
