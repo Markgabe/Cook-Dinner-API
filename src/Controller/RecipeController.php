@@ -16,6 +16,7 @@ use App\Repository\ReceitaRepository;
 use App\Helper\ExtratorDadosRequest;
 
 use App\Controller\UserController;
+use App\Helper\UserFactory;
 
 class RecipeController extends AbstractController
 {
@@ -39,7 +40,7 @@ class RecipeController extends AbstractController
         $dadoEmJson = json_decode($request->getContent());
 
         $repositorio = $this->getDoctrine()->getRepository(User::class);
-        $user = UserController::getUserByToken($request, $repositorio);
+        $user = UserFactory::getUserByToken($request, $repositorio);
 
         $receita = new Receita();
         $receita
