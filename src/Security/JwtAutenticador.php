@@ -58,6 +58,7 @@ class JwtAutenticador extends AbstractGuardAuthenticator
             $request->getPathInfo() !== '/login' 
             && $request->getPathInfo() !== '/sign_up'
             && $request->getPathInfo() !== '/find'
+            && $request->getPathInfo() !== '/pic/{id}'
         );
     }
 
