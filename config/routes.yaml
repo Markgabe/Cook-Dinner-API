@@ -68,3 +68,8 @@ store_profile_pic:
     controller: App\Controller\UserController::storePicture
     methods:
         - POST
+get_profile_picture:
+    path: /pic/{id}
+    controller: App\Controller\UserController::getPicture
+    methods:
+        - GET

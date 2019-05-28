@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 use App\Helper\UserFactory;
 use App\Repository\UserRepository;
@@ -109,6 +110,12 @@ class UserController extends AbstractController
         $user = $this->factory->getUserByToken($request, $this->repository);
         $file->move($this->getParameter('image_upload_directory'), $user->getId().'.png');
         return new JsonResponse();
+    }
+
+    public function getPicture($id): BinaryFileResponse
+    {
+        $file = new BinaryFileResponse($this->getParameter('image_upload_directory').'/'.$id.'.png');
+        return $file;
     }
 
 
