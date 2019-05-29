@@ -92,10 +92,15 @@ class RecipeController extends AbstractController
         return new JsonResponse($recipeList);
     }
 
-    public function removeReceita(int $id): Response
+    public function removeReceita(Request $request, int $id): Response
     {
-        $entidade = $this->repository->find($id);
-        $this->entityManager->remove($entidade);
+        $receita = $this->repository->find($id);
+        $repositorio = $this->getDoctrine()->getRepository(User::class);
+        $user = UserFactory::getUserByToken($request, $repositorio);
+        if ($receita->getUser()->getId() !== $user->getId()){
+            return new Response('', Response::HTTP_UNAUTHORIZED);
+        }
+        $this->entityManager->remove($receita);
         $this->entityManager->flush();
 
         return new Response('', Response::HTTP_NO_CONTENT);

@@ -89,13 +89,10 @@ class UserController extends AbstractController
 
     }
 
-    public function findIdByEmail(Request $request): JsonResponse
+    public function findEmailById($id): JsonResponse
     {
-        $dadosEmJson = json_decode($request->getContent());
-        $user = $this->repository->findOneBy([
-            'email' => $dadosEmJson->email
-        ]);
-        return new JsonResponse(["Id" => $user->getId()]);
+        $user = $this->repository->find($id);
+        return new JsonResponse(["email" => $user->getEmail()]);
     }
 
     public function getCred(Request $request): JsonResponse

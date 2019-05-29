@@ -49,10 +49,10 @@ new_user:
     methods:
         - POST
 find_user:
-    path: /find
-    controller: App\Controller\UserController::findIdByEmail
+    path: /find/{id}
+    controller: App\Controller\UserController::findEmailById
     methods:
-        - POST
+        - GET
 get_cred:
     path: /cred
     controller: App\Controller\UserController::getCred

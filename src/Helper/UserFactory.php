@@ -34,7 +34,7 @@ class UserFactory {
     {
         $cred = JwtAutenticador::getCredentials($request);
         $user = $repository->findOneBy([
-            'email' => $cred->email
+            'id' => $cred->id
         ]);
         return $user;
     }
