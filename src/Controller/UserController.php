@@ -37,16 +37,56 @@ class UserController extends AbstractController
 
     public function newUser(Request $request): JsonResponse
     {
-        $user = $this->factory->newUser($request);
+        $dadosEmJson = json_decode($request->getContent());
 
+        if (is_null($dadosEmJson->email) || is_null($dadosEmJson->senha)){
+            return new JsonResponse([
+                'erro' => 'Favor enviar usuário e senha'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $this->repository->findOneBy(['email' => json_decode($dadosEmJson->email)]);
+        if ($user) {
+            return new JsonResponse(['Erro' => 'Este email já foi cadastrado'], 418);
+        }
+
+        $user = $this->factory->newUser($request);   
         $this->manager->persist($user);
         $this->manager->flush();
-
-        $token = JWT::encode(['email' => $user->getEmail()], 'MinhaChaveBolada', 'HS256');
+        
+        $token = JWT::encode(['id' => $user->getId()], $this->getParameter('auth_key'), 'HS256');
 
         return new JsonResponse([
             'access-token' => $token
         ]);
+    }
+
+    public function login(Request $request): JsonResponse
+    {
+        $dadosEmJson = json_decode($request->getContent());
+
+        if (is_null($dadosEmJson->email) || is_null($dadosEmJson->senha)){
+            return new JsonResponse([
+                'erro' => 'Favor enviar usuário e senha'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $this->repository->findOneBy([
+            'email' => $dadosEmJson->email
+        ]);
+
+        if ($user->getPassword() !== $dadosEmJson->senha){
+            return new JsonResponse([
+                'erro' => 'Usuário ou senha inválidos'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $token = JWT::encode(['id' => $user->getId()], $this->getParameter('auth_key'), 'HS256');
+
+        return new JsonResponse([
+            'access-token' => $token
+        ]);
+
     }
 
     public function findIdByEmail(Request $request): JsonResponse
@@ -104,17 +144,28 @@ class UserController extends AbstractController
         ]);
     }
 
-    public function storePicture(Request $request): JsonResponse
+    public function storePicture(Request $request): Response
     {
         $file = $request->files->get('picture');
+        if (!$file) {
+            return new Response('', Response::HTTP_BAD_REQUEST);
+        }
         $user = $this->factory->getUserByToken($request, $this->repository);
-        $file->move($this->getParameter('image_upload_directory'), $user->getId().'.png');
-        return new JsonResponse();
+        try {
+            $file->move($this->getParameter('profile_image_upload_directory'), $user->getId().'.png');
+        } catch (Exception $e) {
+            return new JsonResponse('', Response::UNSUPPORTED_MEDIA_TYPE);
+        }
+        return new Response('', Response::HTTP_CREATED);
     }
 
-    public function getPicture($id): BinaryFileResponse
+    public function getPicture($id): Response
     {
-        $file = new BinaryFileResponse($this->getParameter('image_upload_directory').'/'.$id.'.png');
+        try {
+            $file = new BinaryFileResponse($this->getParameter('profile_image_upload_directory').'/'.$id.'.png');
+        } catch (Exception $e) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
         return $file;
     }
 

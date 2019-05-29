@@ -4,7 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    image_upload_directory: '%kernel.project_dir%/public/images'
+    profile_image_upload_directory: '%kernel.project_dir%/public/images/profile'
+    recipe_image_upload_directory: '%kernel.project_dir%/public/images/recipes'
+    auth_key: 'ecfca2f9c99031a5b7640485b478dd718b4e1d1aabe0631099320c88a7d215b4'
 
 services:
     # default configuration for services in *this* file

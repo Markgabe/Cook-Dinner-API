@@ -38,6 +38,11 @@ mostra_todas_avaliacoes:
         - GET
 
 # USUÁRIOS
+login:
+    path: /login
+    controller: App\Controller\UserController::login
+    methods:
+        - POST
 new_user:
     path: /sign_up
     controller: App\Controller\UserController::newUser
