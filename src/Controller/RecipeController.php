@@ -3,18 +3,15 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-
 use App\Entity\User;
-
+use JMS\Serializer\SerializerBuilder;
 use App\Entity\Receita;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReceitaRepository;
 use App\Helper\ExtratorDadosRequest;
-
 use App\Controller\UserController;
 use App\Helper\UserFactory;
 
@@ -104,6 +101,28 @@ class RecipeController extends AbstractController
         $this->entityManager->flush();
 
         return new Response('', Response::HTTP_NO_CONTENT);
+    }
+
+    public function recipesFromUsersYouFollow(Request $request): JsonResponse
+    {
+        $repositorio = $this->getDoctrine()->getRepository(User::class);
+        $serializer = SerializerBuilder::create()->build();
+        $user = UserFactory::getUserByToken($request, $repositorio);
+        $followList = $user->getFollow();
+        $idList = $this->listSerialize($followList, $repositorio);
+        return new JsonResponse($idList);
+    }
+
+    public function listSerialize($list, $userRepo)
+    {
+            $newArray = array();
+            foreach ( $list as $item ) {
+                foreach ($item->getRecipes() as $recipe){
+                    array_push($newArray, $recipe);
+                }
+            }
+
+            return $newArray;
     }
 
 }

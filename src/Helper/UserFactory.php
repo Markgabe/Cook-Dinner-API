@@ -18,13 +18,11 @@ class UserFactory {
         return $user;
     }
 
-    public function listSerialize($lis)
+    public function listSerialize($list)
     {
             $newArray = array();
-            $list = json_decode($lis);
             foreach ( $list as $item ) {
-                $new = (object) ['id' => $item->id, 'email' => $item->email];
-                array_push($newArray, $new);
+                array_push($newArray, $item);
             }
 
             return $newArray;

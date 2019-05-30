@@ -24,8 +24,13 @@ remove_receita:
     controller: App\Controller\RecipeController::removeReceita
     methods:
         - DELETE
+receitas_de_seguidos:
+    path: /followedUsersRecipes
+    controller: App\Controller\RecipeController::recipesFromUsersYouFollow
+    methods:
+        - GET
 
-# AVALIÇÕES        
+# AVALIÇÕES
 nova_avaliacao:
     path: /rate
     controller: App\Controller\AvaliacaoController::novaAvaliacao

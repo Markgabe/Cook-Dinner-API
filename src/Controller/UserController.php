@@ -16,8 +16,6 @@ use App\Entity\User;
 use App\Security\JwtAutenticador;
 use Firebase\JWT\JWT;
 
-use JMS\Serializer\SerializerBuilder;
-
 class UserController extends AbstractController
 {
 
@@ -25,7 +23,7 @@ class UserController extends AbstractController
     protected $factory;
     private $repository;
 
-    public function __construct( 
+    public function __construct(
         EntityManagerInterface $manager,
         UserRepository $repository,
         UserFactory $factory
@@ -41,19 +39,19 @@ class UserController extends AbstractController
 
         if (is_null($dadosEmJson->email) || is_null($dadosEmJson->senha)){
             return new JsonResponse([
-                'erro' => 'Favor enviar usuário e senha'
+                'Erro' => 'Favor enviar usuário e senha'
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $user = $this->repository->findOneBy(['email' => json_decode($dadosEmJson->email)]);
+        $user = $this->repository->findOneBy(['email' => $dadosEmJson->email]);
         if ($user) {
             return new JsonResponse(['Erro' => 'Este email já foi cadastrado'], 418);
         }
 
-        $user = $this->factory->newUser($request);   
+        $user = $this->factory->newUser($request);
         $this->manager->persist($user);
         $this->manager->flush();
-        
+
         $token = JWT::encode(['id' => $user->getId()], $this->getParameter('auth_key'), 'HS256');
 
         return new JsonResponse([
@@ -128,12 +126,10 @@ class UserController extends AbstractController
 
     public function getAllFollowers(Request $request): JsonResponse
     {
-        $serializer = SerializerBuilder::create()->build();
-
         $user = $this->factory->getUserByToken($request, $this->repository);
 
-        $list = $serializer->serialize($user->getIsFollowedBy(), 'json');
-        $followList = $serializer->serialize($user->getFollow(), 'json');
+        $list = $user->getIsFollowedBy();
+        $followList = $user->getFollow();
 
         return new JsonResponse([
             "seguidores" => $this->factory->listSerialize($list),
