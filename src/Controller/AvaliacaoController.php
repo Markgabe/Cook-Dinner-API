@@ -32,13 +32,12 @@ class AvaliacaoController extends AbstractController
 
     public function novaAvaliacao(Request $request): JsonResponse
     {
-        $corpoRequisicao = $request->getContent();
-        $dadoEmJson = json_decode($corpoRequisicao);
+        $dadoEmJson = json_decode($request->getContent());
 
-        $receita = $this->recipeRepository->find($dadoEmJson->RID);
+        $receita = $this->recipeRepository->find($dadoEmJson->recipeId);
         if (!$receita) {
             throw $this->createNotFoundException(
-                'No recipe found for id '.$id
+                'No recipe found for id '.$dadoEmJson->recipeId
             );
         }
 
@@ -65,11 +64,22 @@ class AvaliacaoController extends AbstractController
                 'No avaliacao found for id '.$id
             );
         }
-
         return new JsonResponse([
             'Nota da receita' => $avaliacao->getNota(),
             'Favorito' => $avaliacao->getFavorito()
             ]);
+    }
+
+    public function ratesFromRecipe($id): JsonResponse
+    {
+        $repositorio = $this->getDoctrine()->getRepository(Recipe::class);
+        $recipe = $repositorio->find($id);
+        $rateList = $recipe->getAvaliacao();
+        $rateArray = array();
+        foreach($rateList as $rate){
+            array_push($rateArray, $rate);
+        }
+        return new JsonResponse($rateArray);
     }
 
     public function listaTodas(): JsonResponse

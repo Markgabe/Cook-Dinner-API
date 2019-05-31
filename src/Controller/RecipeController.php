@@ -56,9 +56,7 @@ class RecipeController extends AbstractController
         $receita = $this->repository->find($id);
 
         if (!$receita) {
-            throw $this->createNotFoundException(
-                'No recipe found for id '.$id
-            );
+            return new JsonResponse('', Response::HTTP_NO_CONTENT);
         }
 
         return new JsonResponse($receita);

@@ -41,6 +41,11 @@ mostra_todas_avaliacoes:
     controller: App\Controller\AvaliacaoController::listaTodas
     methods:
         - GET
+mostra_avaliacoes_receita:
+    path: /rates/{id}
+    controller: App\Controller\AvaliacaoController::ratesFromRecipe
+    methods:
+        - GET
 
 # USUÁRIOS
 login:
