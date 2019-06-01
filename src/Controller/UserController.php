@@ -108,7 +108,7 @@ class UserController extends AbstractController
 
         if (!$targetUser) {
             throw $this->createNotFoundException(
-                'No user found for id '.$dadosEmJson->id
+                'No user found for id '.$dadoEmJson->id
             );
         }
 
@@ -154,12 +154,10 @@ class UserController extends AbstractController
 
     public function getPicture($id): Response
     {
-        try {
-            $file = new BinaryFileResponse($this->getParameter('profile_image_upload_directory').'/'.$id.'.png');
-        } catch (Exception $e) {
-            return new Response('', Response::HTTP_NOT_FOUND);
+        if(file_exists($this->getParameter('profile_image_upload_directory').'/'.$id.'.png')){
+            return new BinaryFileResponse($this->getParameter('profile_image_upload_directory').'/'.$id.'.png');
         }
-        return $file;
+        return new Response('', Response::HTTP_NOT_FOUND);
     }
 
 
