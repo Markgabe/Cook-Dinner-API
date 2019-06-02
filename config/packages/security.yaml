@@ -19,7 +19,7 @@ security:
             logout: ~
             guard:
                 authenticators:
-                    - App\Security\JwtAutenticador
+                    - App\Security\JwtAuthenticator
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication

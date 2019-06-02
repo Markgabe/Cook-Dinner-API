@@ -11,6 +11,7 @@ use JMS\Serializer\SerializerBuilder;
 use App\Entity\Recipe;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\RecipeRepository;
+use App\Repository\UserRepository;
 use App\Helper\ExtratorDadosRequest;
 use App\Controller\UserController;
 use App\Helper\UserFactory;
@@ -19,32 +20,34 @@ class RecipeController extends AbstractController
 {
 
     protected $repository;
+    protected $userRepository;
     protected $entityManager;
     private $requestDataExtractor;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         RecipeRepository $repository,
-        ExtratorDadosRequest $extratorDadosRequest
+        ExtratorDadosRequest $extratorDadosRequest,
+        UserRepository $userRepository
         ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->requestDataExtractor = $extratorDadosRequest;
+        $this->userRepository = $userRepository;
     }
 
     public function newRecipe(Request $request): JsonResponse
     {
         $jsonData = json_decode($request->getContent());
-
-        $userRepository = $this->getDoctrine()->getRepository(User::class);
-        $user = UserFactory::getUserByToken($request, $userRepository);
+        $user = UserFactory::getUserByToken($request, $this->userRepository);
 
         $recipe = new Recipe();
         $recipe
             ->setName($jsonData->name)
             ->setDescription($jsonData->description)
             ->setUser($user)
-            ->setCreatedAt();
+            ->setCreatedAt()
+            ->setTime(0);
 
         $this->entityManager->persist($recipe);
         $this->entityManager->flush();
@@ -81,9 +84,8 @@ class RecipeController extends AbstractController
 
     public function listUserRecipes(int $userId): JsonResponse
     {
-        $userRepository = $this->getDoctrine()->getRepository(User::class);
         $recipeList = $this->repository->findBy([
-            'user' => $userRepository->find($userId)
+            'user' => $this->userRepository->find($userId)
         ]);
         return new JsonResponse($recipeList);
     } //fully implemented
@@ -91,8 +93,7 @@ class RecipeController extends AbstractController
     public function deleteRecipe(Request $request, int $id): Response
     {
         $recipe = $this->repository->find($id);
-        $userRepository = $this->getDoctrine()->getRepository(User::class);
-        $user = UserFactory::getUserByToken($request, $userRepository);
+        $user = UserFactory::getUserByToken($request, $this->userRepository);
         if ($recipe->getUser()->getId() !== $user->getId()){
             return new Response('', Response::HTTP_UNAUTHORIZED);
         }
@@ -104,10 +105,9 @@ class RecipeController extends AbstractController
 
     public function recipesFromUsersYouFollow(Request $request): JsonResponse
     {
-        $userRepository = $this->getDoctrine()->getRepository(User::class);
-        $user = UserFactory::getUserByToken($request, $userRepository);
+        $user = UserFactory::getUserByToken($request, $this->userRepository);
         $followList = $user->getFollow();
-        $idList = $this->listSerialize($followList, $userRepository);
+        $idList = $this->listSerialize($followList, $this->userRepository);
         return new JsonResponse($idList);
     }
 

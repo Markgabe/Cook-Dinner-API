@@ -4,17 +4,17 @@ namespace App\Helper;
 
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use App\Security\JwtAutenticador;
+use App\Security\JwtAuthenticator;
 
 class UserFactory {
 
     public function newUser(Request $request) {
-        $jsonRequest = json_decode($request->getContent());
+        $jsonData= json_decode($request->getContent());
 
         $user = new User();
         $user
-            ->setEmail($jsonRequest->email)
-            ->setPassword($jsonRequest->senha);
+            ->setEmail($jsonData->username)
+            ->setPassword($jsonData->password);
         return $user;
     }
 
@@ -30,7 +30,7 @@ class UserFactory {
 
     public function getUserByToken(Request $request, $repository)
     {
-        $cred = JwtAutenticador::getCredentials($request);
+        $cred = JwtAuthenticator::getCredentials($request);
         $user = $repository->findOneBy([
             'id' => $cred->id
         ]);

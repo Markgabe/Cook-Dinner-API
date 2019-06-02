@@ -15,12 +15,12 @@ show_all_user_recipes:
     methods:
         - GET
 new_recipe:
-    path: /recipe
+    path: /new_recipe
     controller: App\Controller\RecipeController::newRecipe
     methods:
         - POST
 delete_recipe:
-    path: /recipe/{id}
+    path: /delete_recipe/{id}
     controller: App\Controller\RecipeController::deleteRecipe
     methods:
         - DELETE
@@ -59,7 +59,7 @@ new_user:
     methods:
         - POST
 find_user:
-    path: /find/{id}
+    path: /find_user/{id}
     controller: App\Controller\UserController::findEmailById
     methods:
         - GET

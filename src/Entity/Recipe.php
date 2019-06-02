@@ -47,7 +47,7 @@ class Recipe implements \JsonSerializable
     private $user;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="integer")
      */
     private $time;
 
@@ -73,7 +73,7 @@ class Recipe implements \JsonSerializable
 
     public function setName(string $name): self
     {
-        $this->Nome = $name;
+        $this->name = $name;
 
         return $this;
     }
@@ -105,10 +105,12 @@ class Recipe implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'Id' => $this->getId(),
-            'Nome' => $this->getNome(),
-            'Descrição' => $this->getDescricao(),
-            'IdUser' => $this->getUser()->getId()
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'time' => $this->getTime(),
+            'created_at' => $this->getCreatedAt(),
+            'user_id' => $this->getUser()->getId()
         ];
     }
 
@@ -155,12 +157,12 @@ class Recipe implements \JsonSerializable
         return $this;
     }
 
-    public function getTime(): ?DateTimeInterface
+    public function getTime(): ?int
     {
         return $this->time;
     }
 
-    public function setTime(DateTimeInterface $time): self
+    public function setTime(int $time): self
     {
         $this->time = $time;
 

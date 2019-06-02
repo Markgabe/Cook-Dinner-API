@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
-class JwtAutenticador extends AbstractGuardAuthenticator
+class JwtAuthenticator extends AbstractGuardAuthenticator
 {
 
     private $repository;
@@ -30,6 +30,9 @@ class JwtAutenticador extends AbstractGuardAuthenticator
         return (
             $request->getPathInfo() !== '/login' 
             && $request->getPathInfo() !== '/sign_up'
+            &&(strpos($request->getPathInfo(), '/recipe') === false)
+            &&(strpos($request->getPathInfo(), '/recipes') === false)
+            &&(strpos($request->getPathInfo(), '/rates') === false)
             &&(strpos($request->getPathInfo(), '/find') === false)
             && (strpos($request->getPathInfo(), '/getpic') === false)
         );

@@ -13,7 +13,7 @@ use App\Helper\UserFactory;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
-use App\Security\JwtAutenticador;
+use App\Security\JwtAuthenticator;
 use Firebase\JWT\JWT;
 
 class UserController extends AbstractController
@@ -37,15 +37,15 @@ class UserController extends AbstractController
     {
         $dadosEmJson = json_decode($request->getContent());
 
-        if (is_null($dadosEmJson->email) || is_null($dadosEmJson->senha)){
+        if (is_null($dadosEmJson->username) || is_null($dadosEmJson->password)){
             return new JsonResponse([
                 'Erro' => 'Favor enviar usuário e senha'
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $user = $this->repository->findOneBy(['email' => $dadosEmJson->email]);
+        $user = $this->repository->findOneBy(['email' => $dadosEmJson->username]);
         if ($user) {
-            return new JsonResponse(['Erro' => 'Este email já foi cadastrado'], 418);
+            return new JsonResponse(['erro' => 'Este email já foi cadastrado'], 418);
         }
 
         $user = $this->factory->newUser($request);
@@ -61,19 +61,25 @@ class UserController extends AbstractController
 
     public function login(Request $request): JsonResponse
     {
-        $dadosEmJson = json_decode($request->getContent());
+        $jsonData = json_decode($request->getContent());
 
-        if (is_null($dadosEmJson->email) || is_null($dadosEmJson->senha)){
+        if (is_null($jsonData->username) || is_null($jsonData->password)){
             return new JsonResponse([
                 'erro' => 'Favor enviar usuário e senha'
             ], Response::HTTP_BAD_REQUEST);
         }
 
         $user = $this->repository->findOneBy([
-            'email' => $dadosEmJson->email
+            'email' => $jsonData->username
         ]);
 
-        if ($user->getPassword() !== $dadosEmJson->senha){
+        if (!$user) {
+            return new JsonResponse([
+                'erro' => 'Usuário ou senha inválidos'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if ($user->getPassword() !== $jsonData->password){
             return new JsonResponse([
                 'erro' => 'Usuário ou senha inválidos'
             ], Response::HTTP_UNAUTHORIZED);
@@ -95,7 +101,7 @@ class UserController extends AbstractController
 
     public function getCred(Request $request): JsonResponse
     {
-        $cred = JwtAutenticador::getCredentials($request);
+        $cred = JwtAuthenticator::getCredentials($request);
         return new JsonResponse($cred);
     }
 

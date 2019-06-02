@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AvaliacaoRepository;
 use App\Repository\RecipeRepository;
 
-class AvaliacaoController extends AbstractController
+class RateController extends AbstractController
 {
 
     protected $recipeRepository;
