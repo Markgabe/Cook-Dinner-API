@@ -1,36 +1,36 @@
 # RECEITAS
-mostra_receita:
+show_recipe:
     path: /recipe/{id}
-    controller: App\Controller\RecipeController::mostraReceita
+    controller: App\Controller\RecipeController::showRecipe
     methods:
         - GET
-mostra_todas:
+show_all_recipes:
     path: /recipes
-    controller: App\Controller\RecipeController::listaTodas
+    controller: App\Controller\RecipeController::listAll
     methods:
         - GET
-mostra_todas_usuario:
+show_all_user_recipes:
     path: /recipes/{userId}
-    controller: App\Controller\RecipeController::listaReceitasUsuario
+    controller: App\Controller\RecipeController::listUserRecipes
     methods:
         - GET
-nova_receita:
+new_recipe:
     path: /recipe
-    controller: App\Controller\RecipeController::novaReceita
+    controller: App\Controller\RecipeController::newRecipe
     methods:
         - POST
-remove_receita:
+delete_recipe:
     path: /recipe/{id}
-    controller: App\Controller\RecipeController::removeReceita
+    controller: App\Controller\RecipeController::deleteRecipe
     methods:
         - DELETE
-receitas_de_seguidos:
+followed_users_recipes:
     path: /followedUsersRecipes
     controller: App\Controller\RecipeController::recipesFromUsersYouFollow
     methods:
         - GET
 
-# AVALIÇÕES
+# AVALIAÇÕES
 nova_avaliacao:
     path: /rate
     controller: App\Controller\AvaliacaoController::novaAvaliacao

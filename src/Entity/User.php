@@ -37,7 +37,7 @@ class User implements UserInterface, \JsonSerializable
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Receita", mappedBy="user", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Recipe", mappedBy="user", orphanRemoval=true)
      */
     private $Recipes;
 
@@ -137,14 +137,14 @@ class User implements UserInterface, \JsonSerializable
     }
 
     /**
-     * @return Collection|Receita[]
+     * @return Collection|Recipe[]
      */
     public function getRecipes(): Collection
     {
         return $this->Recipes;
     }
 
-    public function addRecipe(Receita $recipe): self
+    public function addRecipe(Recipe $recipe): self
     {
         if (!$this->Recipes->contains($recipe)) {
             $this->Recipes[] = $recipe;
@@ -154,7 +154,7 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
-    public function removeRecipe(Receita $recipe): self
+    public function removeRecipe(Recipe $recipe): self
     {
         if ($this->Recipes->contains($recipe)) {
             $this->Recipes->removeElement($recipe);

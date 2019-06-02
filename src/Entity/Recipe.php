@@ -2,14 +2,16 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\ReceitaRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\RecipeRepository")
  */
-class Receita implements \JsonSerializable
+class Recipe implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -21,17 +23,17 @@ class Receita implements \JsonSerializable
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $Nome;
+    private $name;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $Descricao;
+    private $description;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $Image;
+    private $image;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Avaliacao", mappedBy="Receita", orphanRemoval=true)
@@ -44,6 +46,16 @@ class Receita implements \JsonSerializable
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="time")
+     */
+    private $time;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created_at;
+
     public function __construct()
     {
         $this->Avaliacao = new ArrayCollection();
@@ -54,38 +66,38 @@ class Receita implements \JsonSerializable
         return $this->id;
     }
 
-    public function getNome(): ?string
+    public function getName(): ?string
     {
-        return $this->Nome;
+        return $this->name;
     }
 
-    public function setNome(string $Nome): self
+    public function setName(string $name): self
     {
-        $this->Nome = $Nome;
+        $this->Nome = $name;
 
         return $this;
     }
 
-    public function getDescricao(): ?string
+    public function getDescription(): ?string
     {
-        return $this->Descricao;
+        return $this->description;
     }
 
-    public function setDescricao(?string $Descricao): self
+    public function setDescription(?string $Description): self
     {
-        $this->Descricao = $Descricao;
+        $this->description = $Description;
 
         return $this;
     }
 
     public function getImage(): ?string
     {
-        return $this->Image;
+        return $this->image;
     }
 
-    public function setImage(?string $Image): self
+    public function setImage(?string $image): self
     {
-        $this->Image = $Image;
+        $this->image = $image;
 
         return $this;
     }
@@ -139,6 +151,30 @@ class Receita implements \JsonSerializable
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getTime(): ?DateTimeInterface
+    {
+        return $this->time;
+    }
+
+    public function setTime(DateTimeInterface $time): self
+    {
+        $this->time = $time;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(): self
+    {
+        $this->created_at = new DateTime();
 
         return $this;
     }

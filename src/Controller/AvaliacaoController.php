@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Avaliacao;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AvaliacaoRepository;
-use App\Repository\ReceitaRepository;
+use App\Repository\RecipeRepository;
 
 class AvaliacaoController extends AbstractController
 {
@@ -23,7 +23,7 @@ class AvaliacaoController extends AbstractController
     public function __construct(
         EntityManagerInterface $entityManager,
         AvaliacaoRepository $repository,
-        ReceitaRepository $recipeRepository
+        RecipeRepository $recipeRepository
         ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;

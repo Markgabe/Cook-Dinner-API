@@ -8,9 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\User;
 use JMS\Serializer\SerializerBuilder;
-use App\Entity\Receita;
+use App\Entity\Recipe;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\ReceitaRepository;
+use App\Repository\RecipeRepository;
 use App\Helper\ExtratorDadosRequest;
 use App\Controller\UserController;
 use App\Helper\UserFactory;
@@ -20,82 +20,83 @@ class RecipeController extends AbstractController
 
     protected $repository;
     protected $entityManager;
-    private $extratorDadosRequest;
+    private $requestDataExtractor;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        ReceitaRepository $repository,
+        RecipeRepository $repository,
         ExtratorDadosRequest $extratorDadosRequest
         ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
-        $this->extratorDadosRequest = $extratorDadosRequest;
+        $this->requestDataExtractor = $extratorDadosRequest;
     }
 
-    public function novaReceita(Request $request): JsonResponse
+    public function newRecipe(Request $request): JsonResponse
     {
-        $dadoEmJson = json_decode($request->getContent());
+        $jsonData = json_decode($request->getContent());
 
-        $repositorio = $this->getDoctrine()->getRepository(User::class);
-        $user = UserFactory::getUserByToken($request, $repositorio);
+        $userRepository = $this->getDoctrine()->getRepository(User::class);
+        $user = UserFactory::getUserByToken($request, $userRepository);
 
-        $receita = new Receita();
-        $receita
-            ->setNome($dadoEmJson->Nome)
-            ->setDescricao($dadoEmJson->Descricao)
-            ->setUser($user);
+        $recipe = new Recipe();
+        $recipe
+            ->setName($jsonData->name)
+            ->setDescription($jsonData->description)
+            ->setUser($user)
+            ->setCreatedAt();
 
-        $this->entityManager->persist($receita);
+        $this->entityManager->persist($recipe);
         $this->entityManager->flush();
 
-        return new JsonResponse($receita);
-    }
+        return new JsonResponse($recipe);
+    } //Not fully implemented
 
-    public function mostraReceita($id): JsonResponse
+    public function showRecipe($id): JsonResponse
     {
-        $receita = $this->repository->find($id);
+        $recipe = $this->repository->find($id);
 
-        if (!$receita) {
+        if (!$recipe) {
             return new JsonResponse('', Response::HTTP_NO_CONTENT);
         }
 
-        return new JsonResponse($receita);
+        return new JsonResponse($recipe);
     }
 
-    public function listaTodas(Request $request): JsonResponse
+    public function listAll(Request $request): JsonResponse
     {
-        $filtro = $this->extratorDadosRequest->buscaDadosFiltro($request);
-        $informacoesDeOrdenacao = $this->extratorDadosRequest->buscaDadosOrdenacao($request);
-        [$paginaAtual, $itensPorPagina] = $this->extratorDadosRequest->buscaDadosPaginacao($request);
+        $filter = $this->requestDataExtractor->buscaDadosFiltro($request);
+        $informacoesDeOrdenacao = $this->requestDataExtractor->buscaDadosOrdenacao($request);
+        [$paginaAtual, $itensPorPagina] = $this->requestDataExtractor->buscaDadosPaginacao($request);
 
-        $lista = $this->repository->findBy(
-            $filtro,
+        $list = $this->repository->findBy(
+            $filter,
             $informacoesDeOrdenacao,
             $itensPorPagina,
             ($paginaAtual - 1) * $itensPorPagina
         );
 
-        return new JsonResponse($lista);
+        return new JsonResponse($list);
     }
 
-    public function listaReceitasUsuario(int $userId): JsonResponse
+    public function listUserRecipes(int $userId): JsonResponse
     {
-        $repositorio = $this->getDoctrine()->getRepository(User::class);
+        $userRepository = $this->getDoctrine()->getRepository(User::class);
         $recipeList = $this->repository->findBy([
-            'user' => $repositorio->find($userId)
+            'user' => $userRepository->find($userId)
         ]);
         return new JsonResponse($recipeList);
-    }
+    } //fully implemented
 
-    public function removeReceita(Request $request, int $id): Response
+    public function deleteRecipe(Request $request, int $id): Response
     {
-        $receita = $this->repository->find($id);
-        $repositorio = $this->getDoctrine()->getRepository(User::class);
-        $user = UserFactory::getUserByToken($request, $repositorio);
-        if ($receita->getUser()->getId() !== $user->getId()){
+        $recipe = $this->repository->find($id);
+        $userRepository = $this->getDoctrine()->getRepository(User::class);
+        $user = UserFactory::getUserByToken($request, $userRepository);
+        if ($recipe->getUser()->getId() !== $user->getId()){
             return new Response('', Response::HTTP_UNAUTHORIZED);
         }
-        $this->entityManager->remove($receita);
+        $this->entityManager->remove($recipe);
         $this->entityManager->flush();
 
         return new Response('', Response::HTTP_NO_CONTENT);
@@ -103,11 +104,10 @@ class RecipeController extends AbstractController
 
     public function recipesFromUsersYouFollow(Request $request): JsonResponse
     {
-        $repositorio = $this->getDoctrine()->getRepository(User::class);
-        $serializer = SerializerBuilder::create()->build();
-        $user = UserFactory::getUserByToken($request, $repositorio);
+        $userRepository = $this->getDoctrine()->getRepository(User::class);
+        $user = UserFactory::getUserByToken($request, $userRepository);
         $followList = $user->getFollow();
-        $idList = $this->listSerialize($followList, $repositorio);
+        $idList = $this->listSerialize($followList, $userRepository);
         return new JsonResponse($idList);
     }
 

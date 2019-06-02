@@ -27,7 +27,7 @@ class Avaliacao implements \JsonSerializable
     private $Favorito;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Receita", inversedBy="Avaliacao")
+     * @ORM\ManyToOne(targetEntity="Recipe", inversedBy="Avaliacao")
      * @ORM\JoinColumn(nullable=false)
      */
     private $Receita;
@@ -61,12 +61,12 @@ class Avaliacao implements \JsonSerializable
         return $this;
     }
 
-    public function getReceita(): ?Receita
+    public function getReceita(): ?Recipe
     {
         return $this->Receita;
     }
 
-    public function setReceita(?Receita $Receita): self
+    public function setReceita(?Recipe $Receita): self
     {
         $this->Receita = $Receita;
 
