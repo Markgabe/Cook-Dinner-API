@@ -8,9 +8,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Entity\Avaliacao;
+use App\Entity\Rate;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\AvaliacaoRepository;
+use App\Repository\RateRepository;
 use App\Repository\RecipeRepository;
 
 class RateController extends AbstractController
@@ -22,7 +22,7 @@ class RateController extends AbstractController
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        AvaliacaoRepository $repository,
+        RateRepository $repository,
         RecipeRepository $recipeRepository
         ) {
         $this->entityManager = $entityManager;
@@ -41,11 +41,11 @@ class RateController extends AbstractController
             );
         }
 
-        $avaliacao = new Avaliacao();
+        $avaliacao = new Rate();
         $avaliacao
-            ->setNota($dadoEmJson->Nota)
-            ->setFavorito($dadoEmJson->Favorito)
-            ->setReceita($receita);
+            ->setGrade($dadoEmJson->Nota)
+            ->setFavorite($dadoEmJson->Favorito)
+            ->setRecipe($receita);
         $receita
             ->addAvaliacao($avaliacao);
 
@@ -65,8 +65,8 @@ class RateController extends AbstractController
             );
         }
         return new JsonResponse([
-            'Nota da receita' => $avaliacao->getNota(),
-            'Favorito' => $avaliacao->getFavorito()
+            'Nota da receita' => $avaliacao->getGrade(),
+            'Favorito' => $avaliacao->getFavorite()
             ]);
     }
 

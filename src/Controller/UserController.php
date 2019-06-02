@@ -35,15 +35,15 @@ class UserController extends AbstractController
 
     public function newUser(Request $request): JsonResponse
     {
-        $dadosEmJson = json_decode($request->getContent());
+        $jsonData = json_decode($request->getContent());
 
-        if (is_null($dadosEmJson->username) || is_null($dadosEmJson->password)){
+        if (is_null($jsonData->username) || is_null($jsonData->password)){
             return new JsonResponse([
                 'Erro' => 'Favor enviar usuário e senha'
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $user = $this->repository->findOneBy(['email' => $dadosEmJson->username]);
+        $user = $this->repository->findOneBy(['email' => $jsonData->username]);
         if ($user) {
             return new JsonResponse(['erro' => 'Este email já foi cadastrado'], 418);
         }
@@ -73,13 +73,7 @@ class UserController extends AbstractController
             'email' => $jsonData->username
         ]);
 
-        if (!$user) {
-            return new JsonResponse([
-                'erro' => 'Usuário ou senha inválidos'
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        if ($user->getPassword() !== $jsonData->password){
+        if (!user || ($user->getPassword() !== $jsonData->password)){
             return new JsonResponse([
                 'erro' => 'Usuário ou senha inválidos'
             ], Response::HTTP_UNAUTHORIZED);
@@ -107,15 +101,13 @@ class UserController extends AbstractController
 
     public function startFollowing(Request $request): JsonResponse
     {
-        $dadoEmJson = json_decode($request->getContent());
+        $jsonData = json_decode($request->getContent());
 
         $user = $this->factory->getUserByToken($request, $this->repository);
-        $targetUser = $this->repository->find($dadoEmJson->id);
+        $targetUser = $this->repository->find($jsonData->id);
 
         if (!$targetUser) {
-            throw $this->createNotFoundException(
-                'No user found for id '.$dadoEmJson->id
-            );
+            return new JsonResponse(["error" => "No user found for this id"], Response::HTTP_NOT_FOUND);
         }
 
         $user->addFollow($targetUser);
@@ -123,10 +115,7 @@ class UserController extends AbstractController
 
         $this->manager->flush();
 
-        return new JsonResponse([
-            'user'=> $user->getId(),
-            'followedUser'=> $targetUser->getId()
-        ]);
+        return new JsonResponse("");
 
     }
 

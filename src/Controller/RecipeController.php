@@ -22,24 +22,27 @@ class RecipeController extends AbstractController
     protected $repository;
     protected $userRepository;
     protected $entityManager;
+    protected $userFactory;
     private $requestDataExtractor;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         RecipeRepository $repository,
         ExtratorDadosRequest $extratorDadosRequest,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        UserFactory $userFactory
         ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->requestDataExtractor = $extratorDadosRequest;
         $this->userRepository = $userRepository;
+        $this->userFactory = $userFactory;
     }
 
     public function newRecipe(Request $request): JsonResponse
     {
         $jsonData = json_decode($request->getContent());
-        $user = UserFactory::getUserByToken($request, $this->userRepository);
+        $user = $this->userFactory->getUserByToken($request, $this->userRepository);
 
         $recipe = new Recipe();
         $recipe
@@ -93,7 +96,7 @@ class RecipeController extends AbstractController
     public function deleteRecipe(Request $request, int $id): Response
     {
         $recipe = $this->repository->find($id);
-        $user = UserFactory::getUserByToken($request, $this->userRepository);
+        $user = $this->userFactory->getUserByToken($request, $this->userRepository);
         if ($recipe->getUser()->getId() !== $user->getId()){
             return new Response('', Response::HTTP_UNAUTHORIZED);
         }
@@ -105,7 +108,7 @@ class RecipeController extends AbstractController
 
     public function recipesFromUsersYouFollow(Request $request): JsonResponse
     {
-        $user = UserFactory::getUserByToken($request, $this->userRepository);
+        $user = $this->userFactory->getUserByToken($request, $this->userRepository);
         $followList = $user->getFollow();
         $idList = $this->listSerialize($followList, $this->userRepository);
         return new JsonResponse($idList);

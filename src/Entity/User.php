@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use DateTime;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -21,14 +22,29 @@ class User implements UserInterface, \JsonSerializable
     private $id;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $birthday;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $gender;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created_at;
+
+    /**
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
-
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
 
     /**
      * @var string The hashed password
@@ -37,9 +53,9 @@ class User implements UserInterface, \JsonSerializable
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity="Recipe", mappedBy="user", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Recipe", mappedBy="user", orphanRemoval=true)
      */
-    private $Recipes;
+    private $recipes;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="isFollowedBy")
@@ -51,9 +67,14 @@ class User implements UserInterface, \JsonSerializable
      */
     private $isFollowedBy;
 
+    /**
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
+
     public function __construct()
     {
-        $this->Recipes = new ArrayCollection();
+        $this->recipes = new ArrayCollection();
         $this->follow = new ArrayCollection();
         $this->isFollowedBy = new ArrayCollection();
     }
@@ -75,33 +96,60 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getBirthday(): ?DateTime
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday(?DateTime $birthday): self
+    {
+        $this->birthday = $birthday;
+
+        return $this;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    public function setGender(?string $gender): self
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?DateTime
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(): self
+    {
+        $this->created_at = new DateTime();
+
+        return $this;
+    }
+
     /**
-     * A visual identifier that represents this user.
-     *
      * @see UserInterface
      */
     public function getUsername(): string
     {
         return (string) $this->email;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
     }
 
     /**
@@ -115,25 +163,7 @@ class User implements UserInterface, \JsonSerializable
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
         return $this;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function getSalt()
-    {
-        // not needed when using the "bcrypt" algorithm in security.yaml
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials()
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     /**
@@ -141,13 +171,13 @@ class User implements UserInterface, \JsonSerializable
      */
     public function getRecipes(): Collection
     {
-        return $this->Recipes;
+        return $this->recipes;
     }
 
     public function addRecipe(Recipe $recipe): self
     {
-        if (!$this->Recipes->contains($recipe)) {
-            $this->Recipes[] = $recipe;
+        if (!$this->recipes->contains($recipe)) {
+            $this->recipes[] = $recipe;
             $recipe->setUser($this);
         }
 
@@ -156,8 +186,8 @@ class User implements UserInterface, \JsonSerializable
 
     public function removeRecipe(Recipe $recipe): self
     {
-        if ($this->Recipes->contains($recipe)) {
-            $this->Recipes->removeElement($recipe);
+        if ($this->recipes->contains($recipe)) {
+            $this->recipes->removeElement($recipe);
             // set the owning side to null (unless already changed)
             if ($recipe->getUser() === $this) {
                 $recipe->setUser(null);
@@ -227,5 +257,40 @@ class User implements UserInterface, \JsonSerializable
             'Id' => $this->getId(),
             'Email' => $this->getEmail()
         ];
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
+    {
+        // not needed when using the "bcrypt" algorithm in security.yaml
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+        return $this;
     }
 }

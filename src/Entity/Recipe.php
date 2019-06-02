@@ -36,17 +36,6 @@ class Recipe implements \JsonSerializable
     private $image;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Avaliacao", mappedBy="Receita", orphanRemoval=true)
-     */
-    private $Avaliacao;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="Recipes")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
-
-    /**
      * @ORM\Column(type="integer")
      */
     private $time;
@@ -56,9 +45,42 @@ class Recipe implements \JsonSerializable
      */
     private $created_at;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Step", mappedBy="recipe", orphanRemoval=true)
+     */
+    private $steps;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Ingredient", mappedBy="recipe", orphanRemoval=true)
+     */
+    private $ingredients;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Rate", mappedBy="recipe", orphanRemoval=true)
+     */
+    private $rates;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="recipes")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $portion;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $grade;
+
     public function __construct()
     {
-        $this->Avaliacao = new ArrayCollection();
+        $this->rates = new ArrayCollection();
+        $this->steps = new ArrayCollection();
+        $this->ingredients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -102,46 +124,31 @@ class Recipe implements \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->getName(),
-            'description' => $this->getDescription(),
-            'time' => $this->getTime(),
-            'created_at' => $this->getCreatedAt(),
-            'user_id' => $this->getUser()->getId()
-        ];
-    }
-
     /**
-     * @return Collection|Avaliacao[]
+     * @return Collection|Rate[]
      */
-    public function getAvaliacao(): Collection
+    public function getRates(): Collection
     {
-        return $this->Avaliacao;
+        return $this->rates;
     }
 
-    public function addAvaliacao(Avaliacao $avaliacao): self
+    public function addRate(Rate $rate): self
     {
-        if (!$this->Avaliacao->contains($avaliacao)) {
-            $this->Avaliacao[] = $avaliacao;
-            $avaliacao->setReceita($this);
+        if (!$this->rates->contains($rate)) {
+            $this->rates[] = $rate;
+            $rate->setRecipe($this);
         }
-
         return $this;
     }
 
-    public function removeAvaliacao(Avaliacao $avaliacao): self
+    public function removeRate(Rate $rate): self
     {
-        if ($this->Avaliacao->contains($avaliacao)) {
-            $this->Avaliacao->removeElement($avaliacao);
-            // set the owning side to null (unless already changed)
-            if ($avaliacao->getReceita() === $this) {
-                $avaliacao->setReceita(null);
+        if ($this->rates->contains($rate)) {
+            $this->rates->removeElement($rate);
+            if ($rate->getRecipe() === $this) {
+                $rate->setRecipe(null);
             }
         }
-
         return $this;
     }
 
@@ -177,6 +184,104 @@ class Recipe implements \JsonSerializable
     public function setCreatedAt(): self
     {
         $this->created_at = new DateTime();
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Step[]
+     */
+    public function getSteps(): Collection
+    {
+        return $this->steps;
+    }
+
+    public function addStep(Step $step): self
+    {
+        if (!$this->steps->contains($step)) {
+            $this->steps[] = $step;
+            $step->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStep(Step $step): self
+    {
+        if ($this->steps->contains($step)) {
+            $this->steps->removeElement($step);
+            // set the owning side to null (unless already changed)
+            if ($step->getRecipe() === $this) {
+                $step->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Ingredient[]
+     */
+    public function getIngredients(): Collection
+    {
+        return $this->ingredients;
+    }
+
+    public function addIngredient(Ingredient $ingredient): self
+    {
+        if (!$this->ingredients->contains($ingredient)) {
+            $this->ingredients[] = $ingredient;
+            $ingredient->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIngredient(Ingredient $ingredient): self
+    {
+        if ($this->ingredients->contains($ingredient)) {
+            $this->ingredients->removeElement($ingredient);
+            // set the owning side to null (unless already changed)
+            if ($ingredient->getRecipe() === $this) {
+                $ingredient->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'time' => $this->getTime(),
+            'created_at' => $this->getCreatedAt(),
+            'user_id' => $this->getUser()->getId()
+        ];
+    }
+
+    public function getPortion(): ?string
+    {
+        return $this->portion;
+    }
+
+    public function setPortion(?string $portion): self
+    {
+        $this->portion = $portion;
+
+        return $this;
+    }
+
+    public function getGrade(): ?float
+    {
+        return $this->grade;
+    }
+
+    public function setGrade(?float $grade): self
+    {
+        $this->grade = $grade;
 
         return $this;
     }
