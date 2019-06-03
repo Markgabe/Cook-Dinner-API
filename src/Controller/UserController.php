@@ -73,7 +73,7 @@ class UserController extends AbstractController
             'email' => $jsonData->username
         ]);
 
-        if (!user || ($user->getPassword() !== $jsonData->password)){
+        if (!$user || ($user->getPassword() !== $jsonData->password)){
             return new JsonResponse([
                 'erro' => 'Usuário ou senha inválidos'
             ], Response::HTTP_UNAUTHORIZED);

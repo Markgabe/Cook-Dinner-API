@@ -1,9 +1,24 @@
 # RECEITAS
+create_recipe:
+    path: /new_recipe
+    controller: App\Controller\RecipeController::createRecipe
+    methods:
+        - POST
 show_recipe:
     path: /recipe/{id}
     controller: App\Controller\RecipeController::showRecipe
     methods:
         - GET
+update_recipe:
+    path: /update_recipe
+    controller: App\Controller\RecipeController::updateRecipe
+    methods:
+        - PUT
+delete_recipe:
+    path: /delete_recipe/{id}
+    controller: App\Controller\RecipeController::deleteRecipe
+    methods:
+        - DELETE
 show_all_recipes:
     path: /recipes
     controller: App\Controller\RecipeController::listAll
@@ -14,19 +29,19 @@ show_all_user_recipes:
     controller: App\Controller\RecipeController::listUserRecipes
     methods:
         - GET
-new_recipe:
-    path: /new_recipe
-    controller: App\Controller\RecipeController::newRecipe
-    methods:
-        - POST
-delete_recipe:
-    path: /delete_recipe/{id}
-    controller: App\Controller\RecipeController::deleteRecipe
-    methods:
-        - DELETE
 followed_users_recipes:
     path: /followedUsersRecipes
     controller: App\Controller\RecipeController::recipesFromUsersYouFollow
+    methods:
+        - GET
+store_recipe_picture:
+    path: /store_recipe_pic/{id}
+    controller: App\Controller\RecipeController::storePicture
+    methods:
+        - POST
+get_recipe_picture:
+    path: /get_recipe_pic/{id}
+    controller: App\Controller\RecipeController::getPicture
     methods:
         - GET
 
@@ -84,7 +99,7 @@ store_profile_pic:
     methods:
         - POST
 get_profile_picture:
-    path: /getpic/{id}
+    path: /get_pic/{id}
     controller: App\Controller\UserController::getPicture
     methods:
         - GET

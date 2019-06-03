@@ -14,7 +14,9 @@ class UserFactory {
         $user = new User();
         $user
             ->setEmail($jsonData->username)
-            ->setPassword($jsonData->password);
+            ->setPassword($jsonData->password)
+            ->setName("")
+            ->setCreatedAt();
         return $user;
     }
 
