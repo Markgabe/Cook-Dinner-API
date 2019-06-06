@@ -4,11 +4,12 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RateRepository")
  */
-class Rate implements \JsonSerializable
+class Rate implements JsonSerializable
 {
     /**
      * @ORM\Id()

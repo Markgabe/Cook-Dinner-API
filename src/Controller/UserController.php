@@ -91,10 +91,10 @@ class UserController extends AbstractController
 
     }
 
-    public function findEmailById($id): JsonResponse
+    public function showUser($id): JsonResponse
     {
         $user = $this->repository->find($id);
-        return new JsonResponse(["email" => $user->getEmail()]);
+        return new JsonResponse($user);
     }
 
     public function getCred(Request $request): JsonResponse

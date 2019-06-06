@@ -2,17 +2,19 @@
 
 namespace App\Entity;
 
+use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use DateTime;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="`user`")
  */
-class User implements UserInterface, \JsonSerializable
+class User implements UserInterface, JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -63,14 +65,14 @@ class User implements UserInterface, \JsonSerializable
     private $recipes;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="isFollowedBy")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="is_followed_by")
      */
-    private $follow;
+    private $follows;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="follow")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="follows")
      */
-    private $isFollowedBy;
+    private $is_followed_by;
 
     /**
      * @ORM\Column(type="json")
@@ -80,8 +82,8 @@ class User implements UserInterface, \JsonSerializable
     public function __construct()
     {
         $this->recipes = new ArrayCollection();
-        $this->follow = new ArrayCollection();
-        $this->isFollowedBy = new ArrayCollection();
+        $this->follows = new ArrayCollection();
+        $this->is_followed_by = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -217,24 +219,24 @@ class User implements UserInterface, \JsonSerializable
     /**
      * @return Collection|self[]
      */
-    public function getFollow(): Collection
+    public function getFollows(): Collection
     {
-        return $this->follow;
+        return $this->follows;
     }
 
-    public function addFollow(self $follow): self
+    public function addFollows(self $follow): self
     {
-        if (!$this->follow->contains($follow)) {
-            $this->follow[] = $follow;
+        if (!$this->follows->contains($follow)) {
+            $this->follows[] = $follow;
         }
 
         return $this;
     }
 
-    public function removeFollow(self $follow): self
+    public function removeFollows(self $follow): self
     {
-        if ($this->follow->contains($follow)) {
-            $this->follow->removeElement($follow);
+        if ($this->follows->contains($follow)) {
+            $this->follows->removeElement($follow);
         }
 
         return $this;
@@ -245,14 +247,14 @@ class User implements UserInterface, \JsonSerializable
      */
     public function getIsFollowedBy(): Collection
     {
-        return $this->isFollowedBy;
+        return $this->is_followed_by;
     }
 
     public function addIsFollowedBy(self $isFollowedBy): self
     {
-        if (!$this->isFollowedBy->contains($isFollowedBy)) {
-            $this->isFollowedBy[] = $isFollowedBy;
-            $isFollowedBy->addFollow($this);
+        if (!$this->is_followed_by->contains($isFollowedBy)) {
+            $this->is_followed_by[] = $isFollowedBy;
+            $isFollowedBy->addFollows($this);
         }
 
         return $this;
@@ -260,20 +262,12 @@ class User implements UserInterface, \JsonSerializable
 
     public function removeIsFollowedBy(self $isFollowedBy): self
     {
-        if ($this->isFollowedBy->contains($isFollowedBy)) {
-            $this->isFollowedBy->removeElement($isFollowedBy);
-            $isFollowedBy->removeFollow($this);
+        if ($this->is_followed_by->contains($isFollowedBy)) {
+            $this->is_followed_by->removeElement($isFollowedBy);
+            $isFollowedBy->removeFollows($this);
         }
 
         return $this;
-    }
-
-    public function jsonSerialize()
-    {
-        return [
-            'Id' => $this->getId(),
-            'Email' => $this->getEmail()
-        ];
     }
 
     /**
@@ -309,5 +303,29 @@ class User implements UserInterface, \JsonSerializable
     {
         $this->roles = $roles;
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'email' => $this->getEmail(),
+            'name' => $this->getName(),
+            'gender' => $this->getGender(),
+            'profile_picture' => '/get_pic/'.$this->getId(),
+            'created_at' => $this->getCreatedAt()->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format("d-m-Y H:i:s"),
+            'recipes' => $this->listSerialize($this->getRecipes()),
+            'follows' => $this->listSerialize($this->getFollows()),
+            'is_followed_by' => $this->listSerialize($this->getIsFollowedBy())
+        ];
+    }
+
+    public function listSerialize($list)
+    {
+        $newArray = array();
+        foreach ( $list as $item ) {
+                array_push($newArray, $item);
+        }
+        return $newArray;
     }
 }

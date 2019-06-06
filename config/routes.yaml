@@ -75,7 +75,7 @@ new_user:
         - POST
 find_user:
     path: /find_user/{id}
-    controller: App\Controller\UserController::findEmailById
+    controller: App\Controller\UserController::showUser
     methods:
         - GET
 get_cred:

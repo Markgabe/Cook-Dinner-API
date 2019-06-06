@@ -4,15 +4,17 @@ namespace App\Entity;
 
 use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RecipeRepository")
  */
-class Recipe implements \JsonSerializable
+class Recipe implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -177,7 +179,7 @@ class Recipe implements \JsonSerializable
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTimeInterface
+    public function getCreatedAt(): DateTime
     {
         return $this->created_at;
     }
@@ -283,10 +285,9 @@ class Recipe implements \JsonSerializable
             'description' => $this->getDescription(),
             'time' => $this->getTime(),
             'portion' => $this->getPortion(),
-            'created_at' => $this->getCreatedAt(),
+            'created_at' => $this->getCreatedAt()->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format("d-m-Y H:i:s"),
             'user_id' => $this->getUser()->getId(),
-            'picture' => (file_exists('C:/Users/Markgabe/Desktop/api-cook-dinner/public/images/recipes/'.$this->getId().'.png')) ?
-                new BinaryFileResponse('C:/Users/Markgabe/Desktop/api-cook-dinner/public/images/recipes/'.$this->getId().'.png') : null
+            'picture' => '/get_recipe_pic/'.$this->getId()
         ];
     }
 }
