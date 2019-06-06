@@ -37,6 +37,11 @@ class User implements UserInterface, \JsonSerializable
     private $gender;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $profile_picture;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created_at;
@@ -128,6 +133,18 @@ class User implements UserInterface, \JsonSerializable
     public function setGender(?string $gender): self
     {
         $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?string
+    {
+        return $this->profile_picture;
+    }
+
+    public function setProfilePicture(?string $profile_picture): self
+    {
+        $this->profile_picture = $profile_picture;
 
         return $this;
     }

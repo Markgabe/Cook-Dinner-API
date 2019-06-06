@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Helper\FileHandler;
 use App\Helper\RateFactory;
 use App\Helper\RecipeFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,23 +30,26 @@ class RecipeController extends AbstractController
     protected $userFactory;
     protected $rateFactory;
     private $requestDataExtractor;
+    private $fileHandler;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         RecipeRepository $repository,
         UserRepository $userRepository,
-        RecipeFactory $recipeFactory,
+        RecipeFactory $factory,
         UserFactory $userFactory,
         RateFactory $rateFactory,
-        ExtratorDadosRequest $extratorDadosRequest
+        ExtratorDadosRequest $extratorDadosRequest,
+        FileHandler $fileHandler
         ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->userRepository = $userRepository;
-        $this->factory = $recipeFactory;
+        $this->factory = $factory;
         $this->userFactory = $userFactory;
         $this->rateFactory = $rateFactory;
         $this->requestDataExtractor = $extratorDadosRequest;
+        $this->fileHandler = $fileHandler;
     }
 
     public function createRecipe(Request $request): JsonResponse
@@ -53,7 +57,7 @@ class RecipeController extends AbstractController
         $jsonData = json_decode($request->getContent());
         $user = $this->userFactory->getUserByToken($request, $this->userRepository);
 
-        $recipe = $this->recipeFactory($request)->setUser($user);
+        $recipe = $this->factory->newRecipe($request)->setUser($user);
 
         $this->entityManager->persist($recipe);
         $this->entityManager->flush();
@@ -70,15 +74,18 @@ class RecipeController extends AbstractController
         return new JsonResponse($recipe);
     }
 
-    public function updateRecipe(Request $request): JsonResponse
+    public function updateRecipe(Request $request, $id): Response
     {
-        $recipe = $this->repository->find($jsonData->id);
+        $user = $this->userFactory->getUserByToken($request, $this->userRepository);
+        $recipe = $this->repository->find($id);
+
+        if ($recipe->getUser() !== $user) return new Response('',Response::HTTP_UNAUTHORIZED);
 
         $recipe = $this->factory->updateRecipe($request, $recipe);
 
         $this->entityManager->flush();
 
-        return new JsonResponse('', Response::HTTP_OK);
+        return new Response('', Response::HTTP_OK);
     }
 
     public function deleteRecipe(Request $request, int $id): Response
@@ -132,19 +139,25 @@ class RecipeController extends AbstractController
         if (!$file) return new Response('', Response::HTTP_BAD_REQUEST);
 
         $recipe = $this->repository->find($id);
-        try {
-            $file->move($this->getParameter('recipe_image_upload_directory'), $recipe->getId().'.png');
-        } catch (Exception $e) {
-            return new JsonResponse('', Response::UNSUPPORTED_MEDIA_TYPE);
-        }
+
+        $fileName = $this->fileHandler->uploadFile($file, '/recipes');
+
+        $recipe->setImage($fileName);
+
+        $this->entityManager->flush();
+
         return new Response('', Response::HTTP_CREATED);
     }
 
     public function getPicture($id): Response
     {
-        if(file_exists($this->getParameter('recipe_image_upload_directory').'/'.$id.'.png'))
-            return new BinaryFileResponse($this->getParameter('recipe_image_upload_directory').'/'.$id.'.png');
-        return new Response('', Response::HTTP_NOT_FOUND);
+        $recipe = $this->repository->find($id);
+
+        $fileName = $recipe->getImage();
+
+        $fileResponse = $this->fileHandler->downloadFile($fileName, '/recipes');
+
+        return $fileResponse;
     }
 
     public function rateRecipe(Request $request, $id): JsonResponse

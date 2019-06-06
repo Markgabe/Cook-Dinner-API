@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Helper\FileHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,15 +23,18 @@ class UserController extends AbstractController
     protected $manager;
     protected $factory;
     private $repository;
+    private $fileHandler;
 
     public function __construct(
         EntityManagerInterface $manager,
         UserRepository $repository,
-        UserFactory $factory
+        UserFactory $factory,
+        FileHandler $fileHandler
         ) {
         $this->manager = $manager;
         $this->repository = $repository;
         $this->factory = $factory;
+        $this->fileHandler = $fileHandler;
     }
 
     public function newUser(Request $request): JsonResponse
@@ -135,24 +139,28 @@ class UserController extends AbstractController
     public function storePicture(Request $request): Response
     {
         $file = $request->files->get('picture');
-        if (!$file) {
-            return new Response('', Response::HTTP_BAD_REQUEST);
-        }
+        if (!$file) return new Response('', Response::HTTP_BAD_REQUEST);
+
         $user = $this->factory->getUserByToken($request, $this->repository);
-        try {
-            $file->move($this->getParameter('profile_image_upload_directory'), $user->getId().'.png');
-        } catch (Exception $e) {
-            return new JsonResponse('', Response::UNSUPPORTED_MEDIA_TYPE);
-        }
+
+        $fileName = $this->fileHandler->uploadFile($file, '/profile');
+
+        $user->setProfilePicture($fileName);
+
+        $this->manager->flush();
+
         return new Response('', Response::HTTP_CREATED);
     }
 
     public function getPicture($id): Response
     {
-        if(file_exists($this->getParameter('profile_image_upload_directory').'/'.$id.'.png')){
-            return new BinaryFileResponse($this->getParameter('profile_image_upload_directory').'/'.$id.'.png');
-        }
-        return new Response('', Response::HTTP_NOT_FOUND);
+        $user = $this->repository->find($id);
+
+        $fileName = $user->getProfilePicture();
+
+        $fileResponse = $this->fileHandler->downloadFile($fileName, '/profile');
+
+        return $fileResponse;
     }
 
 

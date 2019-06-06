@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RecipeRepository")
@@ -250,18 +251,6 @@ class Recipe implements \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->getName(),
-            'description' => $this->getDescription(),
-            'time' => $this->getTime(),
-            'created_at' => $this->getCreatedAt(),
-            'user_id' => $this->getUser()->getId()
-        ];
-    }
-
     public function getPortion(): ?string
     {
         return $this->portion;
@@ -284,5 +273,20 @@ class Recipe implements \JsonSerializable
         $this->grade = $grade;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'time' => $this->getTime(),
+            'portion' => $this->getPortion(),
+            'created_at' => $this->getCreatedAt(),
+            'user_id' => $this->getUser()->getId(),
+            'picture' => (file_exists('C:/Users/Markgabe/Desktop/api-cook-dinner/public/images/recipes/'.$this->getId().'.png')) ?
+                new BinaryFileResponse('C:/Users/Markgabe/Desktop/api-cook-dinner/public/images/recipes/'.$this->getId().'.png') : null
+        ];
     }
 }

@@ -10,7 +10,7 @@ show_recipe:
     methods:
         - GET
 update_recipe:
-    path: /update_recipe
+    path: /update_recipe/{id}
     controller: App\Controller\RecipeController::updateRecipe
     methods:
         - PUT
