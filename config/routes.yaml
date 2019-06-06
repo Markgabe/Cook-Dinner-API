@@ -63,11 +63,6 @@ mostra_avaliacoes_receita:
         - GET
 
 # USUÁRIOS
-login:
-    path: /login
-    controller: App\Controller\UserController::login
-    methods:
-        - POST
 new_user:
     path: /sign_up
     controller: App\Controller\UserController::newUser
@@ -78,6 +73,21 @@ find_user:
     controller: App\Controller\UserController::showUser
     methods:
         - GET
+update_user:
+    path: /update_user
+    controller: App\Controller\UserController::updateUser
+    methods:
+        - PUT
+delete_user:
+    path: /delete_user
+    controller: App\Controller\UserController::deleteUser
+    methods:
+        - DELETE
+login:
+    path: /login
+    controller: App\Controller\UserController::login
+    methods:
+        - POST
 get_cred:
     path: /cred
     controller: App\Controller\UserController::getCred

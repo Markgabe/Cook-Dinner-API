@@ -3,6 +3,7 @@
 namespace App\Helper;
 
 use App\Entity\User;
+use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use App\Security\JwtAuthenticator;
 
@@ -15,8 +16,23 @@ class UserFactory {
         $user
             ->setEmail($jsonData->username)
             ->setPassword($jsonData->password)
-            ->setName("")
+            ->setName( property_exists($jsonData, 'name') ? $jsonData->name : "User")
+            ->setGender( property_exists($jsonData, 'gender') ? $jsonData->gender : "Undefined")
+            ->setBirthday( property_exists($jsonData, 'birthday') ? new DateTime($jsonData->birthday) : new DateTime("00/00/00"))
             ->setCreatedAt();
+        return $user;
+    }
+
+    public function updateUser(Request $request, User $user): User
+    {
+        $jsonData = json_decode($request->getContent());
+
+        $user
+            ->setName( property_exists($jsonData, 'name') ? $jsonData->name : "User")
+            ->setGender( property_exists($jsonData, 'gender') ? $jsonData->gender : "Undefined")
+            ->setBirthday( property_exists($jsonData, 'birthday') ? new DateTime($jsonData->birthday) : new DateTime("00/00/00"))
+            ->setCreatedAt();
+
         return $user;
     }
 

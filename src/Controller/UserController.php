@@ -63,6 +63,34 @@ class UserController extends AbstractController
         ]);
     }
 
+    public function showUser($id): JsonResponse
+    {
+        $user = $this->repository->find($id);
+        return new JsonResponse($user);
+    }
+
+    public function updateUser(Request $request): Response
+    {
+        $user = $this->factory->getUserByToken($request, $this->repository);
+        if (!$user) return new JsonResponse('', Response::HTTP_NOT_FOUND);
+
+        $user = $this->factory->updateUser($request, $user);
+
+        $this->manager->flush();
+
+        return new JsonResponse();
+    }
+
+    public function deleteUser(Request $request): Response
+    {
+        $user = $this->factory->getUserByToken($request, $this->repository);
+
+        $this->manager->remove($user);
+        $this->manager->flush();
+
+        return new Response('', Response::HTTP_NO_CONTENT);
+    }
+
     public function login(Request $request): JsonResponse
     {
         $jsonData = json_decode($request->getContent());
@@ -89,12 +117,6 @@ class UserController extends AbstractController
             'access-token' => $token
         ]);
 
-    }
-
-    public function showUser($id): JsonResponse
-    {
-        $user = $this->repository->find($id);
-        return new JsonResponse($user);
     }
 
     public function getCred(Request $request): JsonResponse

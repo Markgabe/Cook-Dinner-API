@@ -312,6 +312,7 @@ class User implements UserInterface, JsonSerializable
             'email' => $this->getEmail(),
             'name' => $this->getName(),
             'gender' => $this->getGender(),
+            'birthday' => $this->getBirthday()->format('d-m-Y'),
             'profile_picture' => '/get_pic/'.$this->getId(),
             'created_at' => $this->getCreatedAt()->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format("d-m-Y H:i:s"),
             'recipes' => $this->listSerialize($this->getRecipes()),
