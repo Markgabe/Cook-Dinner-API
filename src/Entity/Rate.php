@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeZone;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 use JsonSerializable;
@@ -99,7 +100,7 @@ class Rate implements JsonSerializable
             'grade' => $this->getGrade(),
             'favorite' => $this->getFavorite(),
             'recipe_id' => $this->getRecipe()->getId(),
-            'created_at' => $this->getCreatedAt()
+            'created_at' => $this->getCreatedAt()->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format("d-m-Y H:i:s")
         ];
     }
 }

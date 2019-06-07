@@ -91,6 +91,17 @@ class UserController extends AbstractController
         return new Response('', Response::HTTP_NO_CONTENT);
     }
 
+    public function setPassword(Request $request): Response
+    {
+        $user = $this->factory->getUserByToken($request, $this->repository);
+
+        $user = $this->factory->setPassword($request, $user);
+
+        $this->manager->flush();
+
+        return new JsonResponse();
+    }
+
     public function login(Request $request): JsonResponse
     {
         $jsonData = json_decode($request->getContent());

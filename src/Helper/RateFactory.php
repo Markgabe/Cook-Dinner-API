@@ -7,14 +7,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RateFactory {
 
-    public function createRate(Request $request): Rate
+    public function newRate(Request $request): Rate
     {
-        $jsonData = json_decode($request->getContent());
+        $jsonData= json_decode($request->getContent());
 
         $rate = new Rate();
+
         $rate
-            ->setGrade($jsonData->grade)
-            ->setFavorite($jsonData->favorite)
+            ->setFavorite( property_exists($jsonData, 'favorite') ? $jsonData->favorite : false)
+            ->setGrade(property_exists($jsonData, 'grade') ? $jsonData->grade : null)
             ->setCreatedAt();
 
         return $rate;

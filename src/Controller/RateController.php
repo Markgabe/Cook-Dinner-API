@@ -12,6 +12,7 @@ use App\Entity\Rate;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\RateRepository;
 use App\Repository\RecipeRepository;
+use App\Helper\RateFactory;
 
 class RateController extends AbstractController
 {
@@ -19,40 +20,34 @@ class RateController extends AbstractController
     protected $recipeRepository;
     protected $repository;
     protected $entityManager;
+    private $factory;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         RateRepository $repository,
-        RecipeRepository $recipeRepository
+        RecipeRepository $recipeRepository,
+        RateFactory $rateFactory
         ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->recipeRepository = $recipeRepository;
+        $this->factory = $rateFactory;
     }
 
-    public function novaAvaliacao(Request $request): JsonResponse
+    public function newRate(Request $request, $recipe_id): JsonResponse
     {
-        $dadoEmJson = json_decode($request->getContent());
+        $recipe = $this->recipeRepository->find($recipe_id);
+        if (!$recipe) return new JsonResponse('', Response::HTTP_NOT_FOUND);
 
-        $receita = $this->recipeRepository->find($dadoEmJson->recipeId);
-        if (!$receita) {
-            throw $this->createNotFoundException(
-                'No recipe found for id '.$dadoEmJson->recipeId
-            );
-        }
+        $rate = $this->factory->newRate($request);
+        $rate->setRecipe($recipe);
 
-        $avaliacao = new Rate();
-        $avaliacao
-            ->setGrade($dadoEmJson->Nota)
-            ->setFavorite($dadoEmJson->Favorito)
-            ->setRecipe($receita);
-        $receita
-            ->addAvaliacao($avaliacao);
+        $recipe->addRate($rate);
 
-        $this->entityManager->persist($avaliacao);
+        $this->entityManager->persist($rate);
         $this->entityManager->flush();
 
-        return new JsonResponse($avaliacao);
+        return new JsonResponse();
     }
 
     public function mostraAvaliacao($id): JsonResponse
@@ -72,9 +67,8 @@ class RateController extends AbstractController
 
     public function ratesFromRecipe($id): JsonResponse
     {
-        $repositorio = $this->getDoctrine()->getRepository(Recipe::class);
-        $recipe = $repositorio->find($id);
-        $rateList = $recipe->getAvaliacao();
+        $recipe = $this->recipeRepository->find($id);
+        $rateList = $recipe->getRates();
         $rateArray = array();
         foreach($rateList as $rate){
             array_push($rateArray, $rate);
@@ -82,10 +76,11 @@ class RateController extends AbstractController
         return new JsonResponse($rateArray);
     }
 
-    public function listaTodas(): JsonResponse
+    public function showRate($id): JsonResponse
     {
-        $listaAvaliacoes = $this->repository->findAll();
-        return new JsonResponse($listaAvaliacoes);
+        $rate = $this->repository->find($id);
+
+        return new JsonResponse($rate);
     }
 
 }

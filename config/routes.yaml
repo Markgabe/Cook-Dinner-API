@@ -1,10 +1,10 @@
-# RECEITAS
+# RECIPES
 create_recipe:
     path: /new_recipe
     controller: App\Controller\RecipeController::createRecipe
     methods:
         - POST
-show_recipe:
+read_recipe:
     path: /recipe/{id}
     controller: App\Controller\RecipeController::showRecipe
     methods:
@@ -45,30 +45,30 @@ get_recipe_picture:
     methods:
         - GET
 
-# AVALIAÇÕES
-nova_avaliacao:
-    path: /rate
-    controller: App\Controller\AvaliacaoController::novaAvaliacao
+# RATES
+create_rate:
+    path: /new_rate/{recipe_id}
+    controller: App\Controller\RateController::newRate
     methods:
         - POST
-mostra_todas_avaliacoes:
-    path: /rates
-    controller: App\Controller\AvaliacaoController::listaTodas
+show_rate:
+    path: /rate/{id}
+    controller: App\Controller\RateController::showRate
     methods:
         - GET
 mostra_avaliacoes_receita:
-    path: /rates/{id}
-    controller: App\Controller\AvaliacaoController::ratesFromRecipe
+    path: /rate/recipe/{id}
+    controller: App\Controller\RateController::ratesFromRecipe
     methods:
         - GET
 
-# USUÁRIOS
-new_user:
+# USERS
+create_user:
     path: /sign_up
     controller: App\Controller\UserController::newUser
     methods:
         - POST
-find_user:
+read_user:
     path: /find_user/{id}
     controller: App\Controller\UserController::showUser
     methods:
@@ -83,6 +83,11 @@ delete_user:
     controller: App\Controller\UserController::deleteUser
     methods:
         - DELETE
+change_password:
+    path: /change_password
+    controller: App\Controller\UserController::setPassword
+    methods:
+        - PUT
 login:
     path: /login
     controller: App\Controller\UserController::login

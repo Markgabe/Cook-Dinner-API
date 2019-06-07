@@ -16,9 +16,11 @@ class RecipeFactory {
 
         $recipe
             ->setName($jsonData->name)
-            ->setDescription($jsonData->description)
-            ->setCreatedAt()
-            ->setTime(0);
+            ->setDescription( property_exists($jsonData, 'description') ? $jsonData->description : $jsonData->name)
+            ->setTime( property_exists($jsonData, 'time') ? $jsonData->time : 0)
+            ->setPortion( property_exists($jsonData, 'portion') ? $jsonData->portion : null)
+            ->setGrade(0)
+            ->setCreatedAt();
 
         return $recipe;
     }
@@ -28,10 +30,10 @@ class RecipeFactory {
         $jsonData = json_decode($request->getContent());
 
         $recipe
-            ->setName($jsonData->name)
-            ->setDescription($jsonData->description)
-            ->setTime($jsonData->time)
-            ->setPortion($jsonData->portion);
+            ->setName(property_exists($jsonData, 'name') ? $jsonData->name : $recipe->getName())
+            ->setDescription(property_exists($jsonData, 'description') ? $jsonData->description : $recipe->getDescription())
+            ->setTime(property_exists($jsonData, 'time') ? $jsonData->time : $recipe->getTime())
+            ->setPortion(property_exists($jsonData, 'portion') ? $jsonData->portion : $recipe->getPortion());
 
         return $recipe;
     }

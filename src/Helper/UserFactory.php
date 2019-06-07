@@ -28,10 +28,18 @@ class UserFactory {
         $jsonData = json_decode($request->getContent());
 
         $user
-            ->setName( property_exists($jsonData, 'name') ? $jsonData->name : "User")
-            ->setGender( property_exists($jsonData, 'gender') ? $jsonData->gender : "Undefined")
-            ->setBirthday( property_exists($jsonData, 'birthday') ? new DateTime($jsonData->birthday) : new DateTime("00/00/00"))
-            ->setCreatedAt();
+            ->setName( property_exists($jsonData, 'name') ? $jsonData->name : $user->getName())
+            ->setGender( property_exists($jsonData, 'gender') ? $jsonData->gender : $user->getGender())
+            ->setBirthday( property_exists($jsonData, 'birthday') ? new DateTime($jsonData->birthday) : $user->getBirthday());
+
+        return $user;
+    }
+
+    public function setPassword(Request $request, User $user): User
+    {
+        $jsonData = json_decode($request->getContent());
+
+        $user->setPassword($jsonData->new_password);
 
         return $user;
     }

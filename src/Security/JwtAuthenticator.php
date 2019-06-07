@@ -32,7 +32,7 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
             && $request->getPathInfo() !== '/sign_up'
             &&(strpos($request->getPathInfo(), '/recipe') === false)
             &&(strpos($request->getPathInfo(), '/recipes') === false)
-            &&(strpos($request->getPathInfo(), '/rates') === false)
+            &&(strpos($request->getPathInfo(), '/rate') === false)
             &&(strpos($request->getPathInfo(), '/find') === false)
             && (strpos($request->getPathInfo(), '/get_pic') === false)
             && (strpos($request->getPathInfo(), '/get_recipe_pic') === false)
