@@ -23,7 +23,7 @@ use App\Helper\UserFactory;
 class RecipeController extends AbstractController
 {
 
-    protected $entityManager;
+    protected $manager;
     protected $repository;
     protected $userRepository;
     protected $factory;
@@ -33,7 +33,7 @@ class RecipeController extends AbstractController
     private $fileHandler;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
+        EntityManagerInterface $manager,
         RecipeRepository $repository,
         UserRepository $userRepository,
         RecipeFactory $factory,
@@ -42,7 +42,7 @@ class RecipeController extends AbstractController
         ExtratorDadosRequest $extratorDadosRequest,
         FileHandler $fileHandler
         ) {
-        $this->entityManager = $entityManager;
+        $this->manager = $manager;
         $this->repository = $repository;
         $this->userRepository = $userRepository;
         $this->factory = $factory;
@@ -59,8 +59,8 @@ class RecipeController extends AbstractController
 
         $recipe = $this->factory->newRecipe($request)->setUser($user);
 
-        $this->entityManager->persist($recipe);
-        $this->entityManager->flush();
+        $this->manager->persist($recipe);
+        $this->manager->flush();
 
         return new JsonResponse($recipe);
     } //Not fully implemented
@@ -83,7 +83,7 @@ class RecipeController extends AbstractController
 
         $recipe = $this->factory->updateRecipe($request, $recipe);
 
-        $this->entityManager->flush();
+        $this->manager->flush();
 
         return new Response('', Response::HTTP_OK);
     }
@@ -95,8 +95,8 @@ class RecipeController extends AbstractController
 
         if ($recipe->getUser()->getId() !== $user->getId()) return new Response('', Response::HTTP_UNAUTHORIZED);
 
-        $this->entityManager->remove($recipe);
-        $this->entityManager->flush();
+        $this->manager->remove($recipe);
+        $this->manager->flush();
 
         return new Response('', Response::HTTP_NO_CONTENT);
     }
@@ -144,7 +144,7 @@ class RecipeController extends AbstractController
 
         $recipe->setImage($fileName);
 
-        $this->entityManager->flush();
+        $this->manager->flush();
 
         return new Response('', Response::HTTP_CREATED);
     }
@@ -167,8 +167,8 @@ class RecipeController extends AbstractController
         $rate = $this->rateFactory->createRate($request)->setRecipe($recipe);
         $recipe->addRate($rate);
 
-        $this->entityManager->persist($rate);
-        $this->entityManager->flush();
+        $this->manager->persist($rate);
+        $this->manager->flush();
 
         return new JsonResponse("", Response::HTTP_OK);
     }

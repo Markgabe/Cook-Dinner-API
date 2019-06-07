@@ -4,6 +4,7 @@ namespace App\Helper;
 
 
 use App\Entity\Recipe;
+use App\Entity\Step;
 use Symfony\Component\HttpFoundation\Request;
 
 class RecipeFactory {
@@ -36,6 +37,23 @@ class RecipeFactory {
             ->setPortion(property_exists($jsonData, 'portion') ? $jsonData->portion : $recipe->getPortion());
 
         return $recipe;
+    }
+
+    public function addStep(Request $request, Recipe $recipe): Recipe
+    {
+        $jsonData = json_decode($request->getContent());
+
+        $step = new Step();
+
+        $step
+            ->setDescription($jsonData->description)
+            ->setNumber($jsonData->number)
+            ->setRecipe($recipe);
+
+        $recipe->addStep($step);
+
+        return $recipe;
+
     }
 
     public function listSerialize($list)

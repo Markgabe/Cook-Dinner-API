@@ -44,6 +44,11 @@ get_recipe_picture:
     controller: App\Controller\RecipeController::getPicture
     methods:
         - GET
+add_step:
+    path: /add_step/recipe/{id}
+    controller: App\Controller\StepController::addStep
+    methods:
+        - POST
 
 # RATES
 create_rate:

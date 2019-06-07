@@ -287,7 +287,17 @@ class Recipe implements JsonSerializable
             'portion' => $this->getPortion(),
             'created_at' => $this->getCreatedAt()->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format("d-m-Y H:i:s"),
             'user_id' => $this->getUser()->getId(),
-            'picture' => '/get_recipe_pic/'.$this->getId()
+            'picture' => '/get_recipe_pic/'.$this->getId(),
+            'steps' => $this->listSerialize($this->getSteps())
         ];
+    }
+
+    public function listSerialize($list)
+    {
+        $newArray = array();
+        foreach ( $list as $item ) {
+            array_push($newArray, $item);
+        }
+        return $newArray;
     }
 }
