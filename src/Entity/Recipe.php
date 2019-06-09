@@ -288,6 +288,7 @@ class Recipe implements JsonSerializable
             'created_at' => $this->getCreatedAt()->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format("d-m-Y H:i:s"),
             'user_id' => $this->getUser()->getId(),
             'picture' => '/get_recipe_pic/'.$this->getId(),
+            'has_picture' => $this->getImage() ? true : false,
             'steps' => $this->listSerialize($this->getSteps())
         ];
     }
