@@ -16,6 +16,7 @@ use JsonSerializable;
  */
 class Recipe implements JsonSerializable
 {
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -288,7 +289,9 @@ class Recipe implements JsonSerializable
             'created_at' => $this->getCreatedAt()->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format("d-m-Y H:i:s"),
             'user_id' => $this->getUser()->getId(),
             'picture' => '/get_recipe_pic/'.$this->getId(),
-            'has_picture' => file_exists('../public/images/recipes/'.$this->getImage()) ? true : false,
+            'has_picture' => $this->getImage()
+            ? file_exists(__DIR__.'/../../public/images/recipes/'.$this->getImage())
+            : false,
             'steps' => $this->listSerialize($this->getSteps())
         ];
     }
