@@ -312,7 +312,12 @@ class User implements UserInterface, JsonSerializable
             'email' => $this->getEmail(),
             'name' => $this->getName(),
             'gender' => $this->getGender(),
-            'birthday' => $this->getBirthday()->format('d-m-Y'),
+            'birthday' => $this->getBirthday()
+                ? $this->getBirthday()->format('d-m-Y')
+                : null,
+            'has_picture' => $this->getProfilePicture()
+                ? file_exists(__DIR__.'/../../public/images/recipes/'.$this->getProfilePicture())
+                : false,
             'profile_picture' => '/get_pic/'.$this->getId(),
             'created_at' => $this->getCreatedAt()->setTimezone(new DateTimeZone('America/Sao_Paulo'))->format("d-m-Y H:i:s"),
             'recipes' => $this->listSerialize($this->getRecipes()),

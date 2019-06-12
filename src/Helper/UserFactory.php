@@ -16,9 +16,15 @@ class UserFactory {
         $user
             ->setEmail($jsonData->username)
             ->setPassword($jsonData->password)
-            ->setName( property_exists($jsonData, 'name') ? $jsonData->name : "User")
-            ->setGender( property_exists($jsonData, 'gender') ? $jsonData->gender : "Undefined")
-            ->setBirthday( property_exists($jsonData, 'birthday') ? new DateTime($jsonData->birthday) : new DateTime("00/00/00"))
+            ->setName( property_exists($jsonData, 'name')
+                ? $jsonData->name
+                : "User")
+            ->setGender( property_exists($jsonData, 'gender')
+                ? $jsonData->gender
+                : "Undefined")
+            ->setBirthday( property_exists($jsonData, 'birthday')
+                ? new DateTime($jsonData->birthday)
+                : null )
             ->setCreatedAt();
         return $user;
     }
