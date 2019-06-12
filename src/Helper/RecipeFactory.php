@@ -5,6 +5,7 @@ namespace App\Helper;
 
 use App\Entity\Recipe;
 use App\Entity\Step;
+use App\Repository\RecipeRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 class RecipeFactory {
@@ -54,6 +55,33 @@ class RecipeFactory {
 
         return $recipe;
 
+    }
+
+    public function search(Request $request, RecipeRepository $repository)
+    {
+        $searchKey = array_key_exists('search', $request->query->all())
+            ? $request->query->get("search")
+            : null;
+        $maxResults = array_key_exists('amount', $request->query->all())
+            ? $request->query->get("amount")
+            : 10;
+        $currentPage = array_key_exists('page', $request->query->all())
+            ? $request->query->get("page")
+            : 1;
+
+        if (!$searchKey) return null;
+
+        else {
+            $qb = $repository->createQueryBuilder('u')
+                ->select('u')
+                ->where('u.name like :entity')
+                ->andWhere('u.description like :entity')
+                ->orderBy('u.id')
+                ->setMaxResults($maxResults)
+                ->setFirstResult(($currentPage - 1) * $maxResults)
+                ->setParameter('entity', '%' . $searchKey . '%');
+            return $qb->getQuery()->getResult();
+        }
     }
 
     public function listSerialize($list)

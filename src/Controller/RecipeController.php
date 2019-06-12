@@ -16,7 +16,7 @@ use App\Entity\Recipe;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\RecipeRepository;
 use App\Repository\UserRepository;
-use App\Helper\ExtratorDadosRequest;
+use App\Helper\RequestDataExtractor;
 use App\Controller\UserController;
 use App\Helper\UserFactory;
 
@@ -39,7 +39,7 @@ class RecipeController extends AbstractController
         RecipeFactory $factory,
         UserFactory $userFactory,
         RateFactory $rateFactory,
-        ExtratorDadosRequest $extratorDadosRequest,
+        RequestDataExtractor $extratorDadosRequest,
         FileHandler $fileHandler
         ) {
         $this->manager = $manager;
@@ -103,18 +103,24 @@ class RecipeController extends AbstractController
 
     public function listAll(Request $request): JsonResponse
     {
-        $filter = $this->requestDataExtractor->buscaDadosFiltro($request);
-        $informacoesDeOrdenacao = $this->requestDataExtractor->buscaDadosOrdenacao($request);
-        [$paginaAtual, $itensPorPagina] = $this->requestDataExtractor->buscaDadosPaginacao($request);
+        if ($this->factory->search($request, $this->repository))
+            return new JsonResponse($this->factory->search($request, $this->repository));
 
-        $list = $this->repository->findBy(
-            $filter,
-            $informacoesDeOrdenacao,
-            $itensPorPagina,
-            ($paginaAtual - 1) * $itensPorPagina
-        );
+        else {
 
-        return new JsonResponse($list);
+            $filter = $this->requestDataExtractor->searchFilterData($request);
+            $ordinationData = $this->requestDataExtractor->searchOrdinationData($request);
+            [$currentPage, $itemsPerPage] = $this->requestDataExtractor->searchPaginationData($request);
+
+            $list = $this->repository->findBy(
+                $filter,
+                $ordinationData,
+                $itemsPerPage,
+                ($currentPage - 1) * $itemsPerPage
+            );
+
+            return new JsonResponse($list);
+        }
     }
 
     public function listUserRecipes(int $userId): JsonResponse
@@ -177,5 +183,6 @@ class RecipeController extends AbstractController
     {
 
     }
+
 
 }
