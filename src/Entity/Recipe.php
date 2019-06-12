@@ -292,7 +292,8 @@ class Recipe implements JsonSerializable
             'has_picture' => $this->getImage()
             ? file_exists(__DIR__.'/../../public/images/recipes/'.$this->getImage())
             : false,
-            'steps' => $this->listSerialize($this->getSteps())
+            'steps' => $this->listSerialize($this->getSteps()),
+            'ingredients' => $this->listSerialize($this->getIngredients())
         ];
     }
 

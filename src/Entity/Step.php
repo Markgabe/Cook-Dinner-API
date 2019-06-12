@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\StepRepository")
  */
-class Step
+class Step implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -71,5 +72,14 @@ class Step
         $this->recipe = $recipe;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'number' => $this->getNumber(),
+            'description' => $this->getDescription()
+        ];
     }
 }

@@ -49,6 +49,11 @@ add_step:
     controller: App\Controller\StepController::addStep
     methods:
         - POST
+add_ingredient:
+    path: /add_ingredient/recipe/{id}
+    controller: App\Controller\IngredientController::addIngredient
+    methods:
+        - POST
 
 # RATES
 create_rate:

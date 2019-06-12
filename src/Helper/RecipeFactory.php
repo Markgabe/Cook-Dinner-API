@@ -3,6 +3,7 @@
 namespace App\Helper;
 
 
+use App\Entity\Ingredient;
 use App\Entity\Recipe;
 use App\Entity\Step;
 use App\Repository\RecipeRepository;
@@ -40,7 +41,7 @@ class RecipeFactory {
         return $recipe;
     }
 
-    public function addStep(Request $request, Recipe $recipe): Recipe
+    public function addStep(Request $request, Recipe $recipe): Step
     {
         $jsonData = json_decode($request->getContent());
 
@@ -53,7 +54,24 @@ class RecipeFactory {
 
         $recipe->addStep($step);
 
-        return $recipe;
+        return $step;
+
+    }
+
+    public function addIngredient(Request $request, Recipe $recipe): Ingredient
+    {
+        $jsonData = json_decode($request->getContent());
+
+        $ingredient = new Ingredient();
+
+        $ingredient
+            ->setName($jsonData->name)
+            ->setAmount($jsonData->amount)
+            ->setRecipe($recipe);
+
+        $recipe->addIngredient($ingredient);
+
+        return $ingredient;
 
     }
 
