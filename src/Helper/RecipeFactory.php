@@ -92,8 +92,8 @@ class RecipeFactory {
         else {
             $qb = $repository->createQueryBuilder('u')
                 ->select('u')
-                ->where('u.name like :entity')
-                ->andWhere('u.description like :entity')
+                ->where('lower(u.name) like :entity')
+                ->orWhere('lower(u.description) like :entity')
                 ->orderBy('u.id')
                 ->setMaxResults($maxResults)
                 ->setFirstResult(($currentPage - 1) * $maxResults)
