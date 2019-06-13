@@ -97,7 +97,7 @@ class RecipeFactory {
                 ->orderBy('u.id')
                 ->setMaxResults($maxResults)
                 ->setFirstResult(($currentPage - 1) * $maxResults)
-                ->setParameter('entity', '%' . $searchKey . '%');
+                ->setParameter('entity', '%' . strtolower($searchKey) . '%');
             return $qb->getQuery()->getResult();
         }
     }

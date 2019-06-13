@@ -85,7 +85,7 @@ class RecipeController extends AbstractController
 
         $this->manager->flush();
 
-        return new Response('', Response::HTTP_OK);
+        return new Response(['id' => $recipe->getId()], Response::HTTP_OK);
     }
 
     public function deleteRecipe(Request $request, int $id): Response
@@ -103,7 +103,7 @@ class RecipeController extends AbstractController
 
     public function listAll(Request $request): JsonResponse
     {
-        if ($this->factory->search($request, $this->repository))
+        if (array_key_exists('search', $request->query->all()))
             return new JsonResponse($this->factory->search($request, $this->repository));
 
         else {
